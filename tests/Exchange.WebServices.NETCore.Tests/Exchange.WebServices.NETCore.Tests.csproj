@@ -19,9 +19,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
-	  <PackageReference Include="Microsoft.Identity.Client" Version="4.61.3" />
-	  <PackageReference Include="Microsoft.Identity.Web.TokenCache" Version="2.19.1" />
+	  <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+	  <PackageReference Include="Microsoft.Identity.Client" Version="4.66.1" />
+	  <PackageReference Include="Microsoft.Identity.Web.TokenCache" Version="3.2.2" />
 	</ItemGroup>
 
 </Project>
