@@ -71,8 +71,8 @@ internal sealed class OutlookProtocol
     ///     Converters to translate internal (EXCH) Outlook protocol settings.
     ///     Each entry maps to a lambda expression used to get the matching property from the OutlookProtocol instance.
     /// </summary>
-    private static readonly IReadOnlyDictionary<UserSettingName, Func<OutlookProtocol, object>>
-        InternalProtocolSettings = new Dictionary<UserSettingName, Func<OutlookProtocol, object>>
+    private static readonly IReadOnlyDictionary<UserSettingName, Func<OutlookProtocol, object?>>
+        InternalProtocolSettings = new Dictionary<UserSettingName, Func<OutlookProtocol, object?>>
         {
             // @formatter:off
             { UserSettingName.ActiveDirectoryServer, p => p._activeDirectoryServer },
@@ -107,8 +107,8 @@ internal sealed class OutlookProtocol
     ///     Converters to translate external (EXPR) Outlook protocol settings.
     ///     Each entry maps to a lambda expression used to get the matching property from the OutlookProtocol instance.
     /// </summary>
-    private static readonly IReadOnlyDictionary<UserSettingName, Func<OutlookProtocol, object>>
-        ExternalProtocolSettings = new Dictionary<UserSettingName, Func<OutlookProtocol, object>>
+    private static readonly IReadOnlyDictionary<UserSettingName, Func<OutlookProtocol, object?>>
+        ExternalProtocolSettings = new Dictionary<UserSettingName, Func<OutlookProtocol, object?>>
         {
             // @formatter:off
             { UserSettingName.ExternalEcpDeliveryReportUrl, p => p.ConvertEcpFragmentToUrl(p._ecpUrlRet) },
@@ -144,11 +144,11 @@ internal sealed class OutlookProtocol
     ///     Merged converter dictionary for translating internal (EXCH) Outlook protocol settings.
     ///     Each entry maps to a lambda expression used to get the matching property from the OutlookProtocol instance.
     /// </summary>
-    private static readonly Lazy<Dictionary<UserSettingName, Func<OutlookProtocol, object>>>
+    private static readonly Lazy<Dictionary<UserSettingName, Func<OutlookProtocol, object?>>>
         InternalProtocolConverterDictionary = new(
             () =>
             {
-                var results = new Dictionary<UserSettingName, Func<OutlookProtocol, object>>();
+                var results = new Dictionary<UserSettingName, Func<OutlookProtocol, object?>>();
 
                 foreach (var (key, value) in CommonProtocolSettings.ToList())
                 {
@@ -168,11 +168,11 @@ internal sealed class OutlookProtocol
     ///     Merged converter dictionary for translating external (EXPR) Outlook protocol settings.
     ///     Each entry maps to a lambda expression used to get the matching property from the OutlookProtocol instance.
     /// </summary>
-    private static readonly Lazy<Dictionary<UserSettingName, Func<OutlookProtocol, object>>>
+    private static readonly Lazy<Dictionary<UserSettingName, Func<OutlookProtocol, object?>>>
         ExternalProtocolConverterDictionary = new(
             () =>
             {
-                var results = new Dictionary<UserSettingName, Func<OutlookProtocol, object>>();
+                var results = new Dictionary<UserSettingName, Func<OutlookProtocol, object?>>();
 
                 foreach (var (key, value) in CommonProtocolSettings.ToList())
                 {

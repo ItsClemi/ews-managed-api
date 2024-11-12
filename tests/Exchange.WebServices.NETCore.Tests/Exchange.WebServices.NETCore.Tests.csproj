@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
@@ -20,8 +20,8 @@
 
 	<ItemGroup>
 	  <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
-	  <PackageReference Include="Microsoft.Identity.Client" Version="4.66.1" />
-	  <PackageReference Include="Microsoft.Identity.Web.TokenCache" Version="3.2.2" />
+	  <PackageReference Include="Microsoft.Identity.Client" Version="4.66.2" />
+	  <PackageReference Include="Microsoft.Identity.Web.TokenCache" Version="3.3.1" />
 	</ItemGroup>
 
 </Project>
