@@ -84,6 +84,11 @@ public class ServiceObjectPropertyException : PropertyException
     /// </summary>
     /// <param name="info">The object that holds the serialized object data.</param>
     /// <param name="context">The contextual information about the source or destination.</param>
+    [Obsolete(
+        "This API supports obsolete formatter-based serialization. It should not be called or extended by application code.",
+        DiagnosticId = "SYSLIB0051",
+        UrlFormat = "https://aka.ms/dotnet-warnings/{0}"
+    )]
     protected ServiceObjectPropertyException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
@@ -103,6 +108,11 @@ public class ServiceObjectPropertyException : PropertyException
     ///     The <paramref name="info" /> object is a null reference (Nothing in
     ///     Visual Basic).
     /// </exception>
+    [Obsolete(
+        "This API supports obsolete formatter-based serialization. It should not be called or extended by application code.",
+        DiagnosticId = "SYSLIB0051",
+        UrlFormat = "https://aka.ms/dotnet-warnings/{0}"
+    )]
     public override void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         EwsUtilities.Assert(info != null, "ServiceObjectPropertyException.GetObjectData", "info is null");

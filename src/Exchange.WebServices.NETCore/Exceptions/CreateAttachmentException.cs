@@ -69,6 +69,11 @@ public sealed class CreateAttachmentException : BatchServiceResponseException<Cr
     /// </summary>
     /// <param name="info">The object that holds the serialized object data.</param>
     /// <param name="context">The contextual information about the source or destination.</param>
+    [Obsolete(
+        "This API supports obsolete formatter-based serialization. It should not be called or extended by application code.",
+        DiagnosticId = "SYSLIB0051",
+        UrlFormat = "https://aka.ms/dotnet-warnings/{0}"
+    )]
     private CreateAttachmentException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {
