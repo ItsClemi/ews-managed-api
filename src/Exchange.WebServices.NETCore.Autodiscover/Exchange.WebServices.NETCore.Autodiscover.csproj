@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFrameworks>net9.0; net8.0</TargetFrameworks>
 
 		<PackageTags>ews exchange office365 Microsoft Web API Email Client Library C#</PackageTags>
 		<PackageProjectUrl>https://github.com/ItsClemi/ews-managed-api</PackageProjectUrl>
