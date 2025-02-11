@@ -6,7 +6,7 @@ internal class EwsHttpClientException : Exception
     public HttpResponseMessage? Response { get; }
 
     public EwsHttpClientException(Exception e)
-        : base(e.Message)
+        : base(e.Message, e)
     {
     }
 
