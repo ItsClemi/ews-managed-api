@@ -36,7 +36,7 @@ internal abstract class SimpleServiceRequestBase : ServiceRequestBase
     ///     Initializes a new instance of the <see cref="SimpleServiceRequestBase" /> class.
     /// </summary>
     /// <param name="service">The service.</param>
-    internal SimpleServiceRequestBase(ExchangeService service)
+    protected SimpleServiceRequestBase(ExchangeService service)
         : base(service)
     {
     }
@@ -45,10 +45,10 @@ internal abstract class SimpleServiceRequestBase : ServiceRequestBase
     ///     Executes this request.
     /// </summary>
     /// <returns>Service response.</returns>
-    internal async Task<TResponse> InternalExecuteAsync<TResponse>(CancellationToken token)
+    internal async Task<TResponse> InternalExecuteAsync<TResponse>(CancellationToken cancellationToken)
         where TResponse : class
     {
-        var (_, response) = await ValidateAndEmitRequest(false, token).ConfigureAwait(false);
+        var (_, response) = await ValidateAndEmitRequest(headersOnly: false, cancellationToken).ConfigureAwait(false);
         try
         {
             var result = await ReadResponse(response).ConfigureAwait(false) as TResponse;
@@ -79,7 +79,9 @@ internal abstract class SimpleServiceRequestBase : ServiceRequestBase
             if (Service.IsTraceEnabledFor(TraceFlags.EwsResponse))
             {
                 using var memoryStream = new MemoryStream();
-                await using (var serviceResponseStream = await GetResponseStream(response).ConfigureAwait(false))
+
+                var serviceResponseStream = await GetResponseStream(response).ConfigureAwait(false);
+                await using (serviceResponseStream.ConfigureAwait(false))
                 {
                     // Copy response to in-memory stream and reset position to start.
                     await serviceResponseStream.CopyToAsync(memoryStream).ConfigureAwait(false);
@@ -92,8 +94,12 @@ internal abstract class SimpleServiceRequestBase : ServiceRequestBase
             }
             else
             {
-                await using var responseStream = await GetResponseStream(response).ConfigureAwait(false);
-                serviceResponse = ReadResponseXml(responseStream, response.Headers);
+                var responseStream = await GetResponseStream(response).ConfigureAwait(false);
+
+                await using (responseStream.ConfigureAwait(false))
+                {
+                    serviceResponse = ReadResponseXml(responseStream, response.Headers);
+                }
             }
         }
         catch (EwsHttpClientException e)

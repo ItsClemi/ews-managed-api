@@ -84,35 +84,21 @@ internal abstract class ServiceRequestBase
     ///     Initializes a new instance of the <see cref="ServiceRequestBase" /> class.
     /// </summary>
     /// <param name="service">The service.</param>
-    internal ServiceRequestBase(ExchangeService service)
+    protected ServiceRequestBase(ExchangeService service)
     {
         Service = service ?? throw new ArgumentNullException(nameof(service));
         ThrowIfNotSupportedByRequestedServerVersion();
     }
 
     /// <summary>
-    ///     Gets the response stream (may be wrapped with GZip/Deflate stream to decompress content)
+    ///     Gets the response stream (maybe wrapped with GZip/Deflate stream to decompress content)
     /// </summary>
     /// <param name="response">HttpWebResponse.</param>
     /// <returns>ResponseStream</returns>
     protected static async Task<Stream> GetResponseStream(IEwsHttpWebResponse response)
     {
-        var responseStream = await response.GetResponseStream();
+        var responseStream = await response.GetResponseStream().ConfigureAwait(false);
 
-        return WrapStream(responseStream, response.ContentEncoding);
-    }
-
-    /// <summary>
-    ///     Gets the response stream (may be wrapped with GZip/Deflate stream to decompress content)
-    /// </summary>
-    /// <param name="response">HttpWebResponse.</param>
-    /// <param name="readTimeout">read timeout in milliseconds</param>
-    /// <returns>ResponseStream</returns>
-    protected static async Task<Stream> GetResponseStream(IEwsHttpWebResponse response, int readTimeout)
-    {
-        var responseStream = await response.GetResponseStream();
-
-        responseStream.ReadTimeout = readTimeout;
         return WrapStream(responseStream, response.ContentEncoding);
     }
 
@@ -123,12 +109,12 @@ internal abstract class ServiceRequestBase
             return responseStream;
         }
 
-        if (contentEncoding.ToLowerInvariant().Contains("gzip"))
+        if (contentEncoding.Contains("gzip", StringComparison.InvariantCultureIgnoreCase))
         {
             return new GZipStream(responseStream, CompressionMode.Decompress);
         }
 
-        if (contentEncoding.ToLowerInvariant().Contains("deflate"))
+        if (contentEncoding.Contains("deflate", StringComparison.InvariantCultureIgnoreCase))
         {
             return new DeflateStream(responseStream, CompressionMode.Decompress);
         }
@@ -757,17 +743,17 @@ internal abstract class ServiceRequestBase
     /// </summary>
     /// <param name="request">The specified IEwsHttpWebRequest</param>
     /// <param name="headersOnly"></param>
-    /// <param name="token"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>An IEwsHttpWebResponse instance</returns>
     private async Task<IEwsHttpWebResponse> GetEwsHttpWebResponse(
         EwsHttpWebRequest request,
         bool headersOnly,
-        CancellationToken token
+        CancellationToken cancellationToken
     )
     {
         try
         {
-            return await request.GetResponse(headersOnly, token).ConfigureAwait(false);
+            return await request.GetResponse(headersOnly, cancellationToken).ConfigureAwait(false);
         }
         catch (EwsHttpClientException ex)
         {

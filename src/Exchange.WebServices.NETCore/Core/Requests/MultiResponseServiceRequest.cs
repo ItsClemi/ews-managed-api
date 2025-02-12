@@ -42,7 +42,7 @@ internal abstract class MultiResponseServiceRequest<TResponse> : SimpleServiceRe
     /// </summary>
     /// <param name="service">The service.</param>
     /// <param name="errorHandlingMode"> Indicates how errors should be handled.</param>
-    internal MultiResponseServiceRequest(ExchangeService service, ServiceErrorHandling errorHandlingMode)
+    protected MultiResponseServiceRequest(ExchangeService service, ServiceErrorHandling errorHandlingMode)
         : base(service)
     {
         ErrorHandlingMode = errorHandlingMode;
@@ -128,10 +128,10 @@ internal abstract class MultiResponseServiceRequest<TResponse> : SimpleServiceRe
     ///     Executes this request.
     /// </summary>
     /// <returns>Service response collection.</returns>
-    internal async Task<ServiceResponseCollection<TResponse>> ExecuteAsync(CancellationToken token)
+    internal async Task<ServiceResponseCollection<TResponse>> ExecuteAsync(CancellationToken cancellationToken)
     {
-        var serviceResponses =
-            await InternalExecuteAsync<ServiceResponseCollection<TResponse>>(token).ConfigureAwait(false);
+        var serviceResponses = await InternalExecuteAsync<ServiceResponseCollection<TResponse>>(cancellationToken)
+            .ConfigureAwait(false);
 
         if (ErrorHandlingMode == ServiceErrorHandling.ThrowOnError)
         {
