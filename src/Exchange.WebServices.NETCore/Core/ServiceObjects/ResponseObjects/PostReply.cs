@@ -83,7 +83,8 @@ public sealed class PostReply : ServiceObject
     {
         ((ItemId)PropertyBag[ResponseObjectSchema.ReferenceItemId]).Assign(_referenceItem.Id);
 
-        var items = await Service.InternalCreateResponseObject(this, parentFolderId, messageDisposition, token);
+        var items = await Service.InternalCreateResponseObject(this, parentFolderId, messageDisposition, token)
+            .ConfigureAwait(false);
 
         var postItem = EwsUtilities.FindFirstItemOfType<PostItem>(items);
 

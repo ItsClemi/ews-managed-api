@@ -275,7 +275,7 @@ public class Folder : ServiceObject
 
         if (IsDirty)
         {
-            await Service.CreateFolder(this, parentFolderId, token);
+            await Service.CreateFolder(this, parentFolderId, token).ConfigureAwait(false);
         }
     }
 
@@ -297,7 +297,7 @@ public class Folder : ServiceObject
         {
             if (PropertyBag.GetIsUpdateCallNecessary())
             {
-                await Service.UpdateFolder(this, token);
+                await Service.UpdateFolder(this, token).ConfigureAwait(false);
             }
         }
     }
@@ -378,10 +378,7 @@ public class Folder : ServiceObject
         ThrowIfThisIsNew();
 
         return Service.FindItems<TItem>(
-            new[]
-            {
-                Id,
-            },
+            [Id,],
             null,
             queryString,
             view,
@@ -415,10 +412,7 @@ public class Folder : ServiceObject
         ThrowIfThisIsNew();
 
         return Service.FindItems<TItem>(
-            new[]
-            {
-                Id,
-            },
+            [Id,],
             searchFilter,
             null,
             view,
@@ -625,24 +619,24 @@ public class Folder : ServiceObject
     /// <summary>
     ///     Gets the Id of the folder.
     /// </summary>
-    public FolderId Id => (FolderId)PropertyBag[GetIdPropertyDefinition()];
+    public FolderId Id => (FolderId)PropertyBag[GetIdPropertyDefinition()]!;
 
     /// <summary>
     ///     Gets the Id of this folder's parent folder.
     /// </summary>
-    public FolderId ParentFolderId => (FolderId)PropertyBag[FolderSchema.ParentFolderId];
+    public FolderId ParentFolderId => (FolderId)PropertyBag[FolderSchema.ParentFolderId]!;
 
     /// <summary>
     ///     Gets the number of child folders this folder has.
     /// </summary>
-    public int ChildFolderCount => (int)PropertyBag[FolderSchema.ChildFolderCount];
+    public int ChildFolderCount => (int)PropertyBag[FolderSchema.ChildFolderCount]!;
 
     /// <summary>
     ///     Gets or sets the display name of the folder.
     /// </summary>
     public string DisplayName
     {
-        get => (string)PropertyBag[FolderSchema.DisplayName];
+        get => (string)PropertyBag[FolderSchema.DisplayName]!;
         set => PropertyBag[FolderSchema.DisplayName] = value;
     }
 
@@ -651,48 +645,48 @@ public class Folder : ServiceObject
     /// </summary>
     public string FolderClass
     {
-        get => (string)PropertyBag[FolderSchema.FolderClass];
+        get => (string)PropertyBag[FolderSchema.FolderClass]!;
         set => PropertyBag[FolderSchema.FolderClass] = value;
     }
 
     /// <summary>
     ///     Gets the total number of items contained in the folder.
     /// </summary>
-    public int TotalCount => (int)PropertyBag[FolderSchema.TotalCount];
+    public int TotalCount => (int)PropertyBag[FolderSchema.TotalCount]!;
 
     /// <summary>
     ///     Gets a list of extended properties associated with the folder.
     /// </summary>
     public ExtendedPropertyCollection ExtendedProperties =>
-        (ExtendedPropertyCollection)PropertyBag[ServiceObjectSchema.ExtendedProperties];
+        (ExtendedPropertyCollection)PropertyBag[ServiceObjectSchema.ExtendedProperties]!;
 
     /// <summary>
     ///     Gets the Email Lifecycle Management (ELC) information associated with the folder.
     /// </summary>
     public ManagedFolderInformation ManagedFolderInformation =>
-        (ManagedFolderInformation)PropertyBag[FolderSchema.ManagedFolderInformation];
+        (ManagedFolderInformation)PropertyBag[FolderSchema.ManagedFolderInformation]!;
 
     /// <summary>
     ///     Gets a value indicating the effective rights the current authenticated user has on the folder.
     /// </summary>
-    public EffectiveRights EffectiveRights => (EffectiveRights)PropertyBag[FolderSchema.EffectiveRights];
+    public EffectiveRights EffectiveRights => (EffectiveRights)PropertyBag[FolderSchema.EffectiveRights]!;
 
     /// <summary>
     ///     Gets a list of permissions for the folder.
     /// </summary>
-    public FolderPermissionCollection Permissions => (FolderPermissionCollection)PropertyBag[FolderSchema.Permissions];
+    public FolderPermissionCollection Permissions => (FolderPermissionCollection)PropertyBag[FolderSchema.Permissions]!;
 
     /// <summary>
     ///     Gets the number of unread items in the folder.
     /// </summary>
-    public int UnreadCount => (int)PropertyBag[FolderSchema.UnreadCount];
+    public int UnreadCount => (int)PropertyBag[FolderSchema.UnreadCount]!;
 
     /// <summary>
     ///     Gets or sets the policy tag.
     /// </summary>
     public PolicyTag PolicyTag
     {
-        get => (PolicyTag)PropertyBag[FolderSchema.PolicyTag];
+        get => (PolicyTag)PropertyBag[FolderSchema.PolicyTag]!;
         set => PropertyBag[FolderSchema.PolicyTag] = value;
     }
 
@@ -701,7 +695,7 @@ public class Folder : ServiceObject
     /// </summary>
     public ArchiveTag ArchiveTag
     {
-        get => (ArchiveTag)PropertyBag[FolderSchema.ArchiveTag];
+        get => (ArchiveTag)PropertyBag[FolderSchema.ArchiveTag]!;
         set => PropertyBag[FolderSchema.ArchiveTag] = value;
     }
 
@@ -709,7 +703,7 @@ public class Folder : ServiceObject
     ///     Gets the well known name of this folder, if any, as a string.
     /// </summary>
     /// <value>The well known name of this folder as a string, or null if this folder isn't a well known folder.</value>
-    public string WellKnownFolderNameAsString => (string)PropertyBag[FolderSchema.WellKnownFolderName];
+    public string WellKnownFolderNameAsString => (string)PropertyBag[FolderSchema.WellKnownFolderName]!;
 
     /// <summary>
     ///     Gets the well known name of this folder, if any.

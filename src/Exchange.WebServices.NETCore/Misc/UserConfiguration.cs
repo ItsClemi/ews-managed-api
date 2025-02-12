@@ -219,7 +219,7 @@ public class UserConfiguration
         CancellationToken token = default
     )
     {
-        var result = await service.GetUserConfiguration(name, parentFolderId, properties, token);
+        var result = await service.GetUserConfiguration(name, parentFolderId, properties, token).ConfigureAwait(false);
 
         result._isNew = false;
 
@@ -270,7 +270,7 @@ public class UserConfiguration
         ParentFolderId = parentFolderId;
         Name = name;
 
-        await _service.CreateUserConfiguration(this, token);
+        await _service.CreateUserConfiguration(this, token).ConfigureAwait(false);
 
         _isNew = false;
 
@@ -302,7 +302,7 @@ public class UserConfiguration
             IsPropertyUpdated(UserConfigurationProperties.Dictionary) ||
             IsPropertyUpdated(UserConfigurationProperties.XmlData))
         {
-            await _service.UpdateUserConfiguration(this, token);
+            await _service.UpdateUserConfiguration(this, token).ConfigureAwait(false);
         }
 
         ResetIsDirty();
@@ -318,7 +318,7 @@ public class UserConfiguration
             throw new InvalidOperationException(Strings.DeleteInvalidForUnsavedUserConfiguration);
         }
 
-        await _service.DeleteUserConfiguration(Name, ParentFolderId, token);
+        await _service.DeleteUserConfiguration(Name, ParentFolderId, token).ConfigureAwait(false);
     }
 
     /// <summary>

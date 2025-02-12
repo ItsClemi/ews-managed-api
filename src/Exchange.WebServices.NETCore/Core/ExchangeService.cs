@@ -1116,10 +1116,7 @@ public sealed class ExchangeService : ExchangeServiceBase
     )
     {
         var responses = await InternalUpdateItems(
-                new[]
-                {
-                    item,
-                },
+                [item,],
                 savedItemsDestinationFolderId,
                 conflictResolution,
                 messageDisposition,
@@ -1147,10 +1144,7 @@ public sealed class ExchangeService : ExchangeServiceBase
     {
         var request = new SendItemRequest(this, ServiceErrorHandling.ThrowOnError)
         {
-            Items = new[]
-            {
-                item,
-            },
+            Items = [item,],
             SavedCopyDestinationFolderId = savedCopyDestinationFolderId,
         };
 
@@ -1234,10 +1228,7 @@ public sealed class ExchangeService : ExchangeServiceBase
     internal async Task<Item> CopyItem(ItemId itemId, FolderId destinationFolderId, CancellationToken token)
     {
         var result = await InternalCopyItems(
-                new[]
-                {
-                    itemId,
-                },
+                [itemId,],
                 destinationFolderId,
                 null,
                 ServiceErrorHandling.ThrowOnError,
@@ -1328,10 +1319,7 @@ public sealed class ExchangeService : ExchangeServiceBase
     internal async Task<Item> MoveItem(ItemId itemId, FolderId destinationFolderId, CancellationToken token)
     {
         var result = await InternalMoveItems(
-                new[]
-                {
-                    itemId,
-                },
+                [itemId,],
                 destinationFolderId,
                 null,
                 ServiceErrorHandling.ThrowOnError,
@@ -1430,10 +1418,7 @@ public sealed class ExchangeService : ExchangeServiceBase
         EwsUtilities.ValidateParamAllowNull(queryString);
 
         var responses = await FindItems<Item>(
-                new[]
-                {
-                    parentFolderId,
-                },
+                [parentFolderId,],
                 null,
                 queryString,
                 view,
@@ -1465,10 +1450,7 @@ public sealed class ExchangeService : ExchangeServiceBase
         CancellationToken token = default
     )
     {
-        FolderId[] parentFolderIds =
-        {
-            parentFolderId,
-        };
+        FolderId[] parentFolderIds = [parentFolderId,];
 
         EwsUtilities.ValidateParamCollection(parentFolderIds);
         EwsUtilities.ValidateParam(view);
@@ -1508,10 +1490,7 @@ public sealed class ExchangeService : ExchangeServiceBase
         CancellationToken token = default
     )
     {
-        FolderId[] parentFolderIds =
-        {
-            parentFolderId,
-        };
+        FolderId[] parentFolderIds = [parentFolderId,];
 
         EwsUtilities.ValidateParamCollection(parentFolderIds);
         EwsUtilities.ValidateParam(view);
@@ -1557,10 +1536,7 @@ public sealed class ExchangeService : ExchangeServiceBase
         EwsUtilities.ValidateParamAllowNull(searchFilter);
 
         var responses = await FindItems<Item>(
-                new[]
-                {
-                    parentFolderId,
-                },
+                [parentFolderId,],
                 searchFilter,
                 null,
                 view,
@@ -4781,15 +4757,8 @@ public sealed class ExchangeService : ExchangeServiceBase
     {
         EwsUtilities.ValidateParam(id);
 
-        var responses = await InternalConvertIds(
-            new[]
-            {
-                id,
-            },
-            destinationFormat,
-            ServiceErrorHandling.ThrowOnError,
-            token
-        );
+        var responses = await InternalConvertIds([id,], destinationFormat, ServiceErrorHandling.ThrowOnError, token)
+            .ConfigureAwait(false);
 
         return responses[0].ConvertedId;
     }
@@ -6188,7 +6157,7 @@ public sealed class ExchangeService : ExchangeServiceBase
     {
         var endpoint = AdjustServiceUriFromCredentials(Url);
 
-        var request = await PrepareHttpWebRequestForUrl(endpoint);
+        var request = await PrepareHttpWebRequestForUrl(endpoint).ConfigureAwait(false);
 
         if (!string.IsNullOrEmpty(TargetServerVersion))
         {

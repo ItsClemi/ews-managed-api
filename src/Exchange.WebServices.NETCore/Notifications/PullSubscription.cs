@@ -55,7 +55,7 @@ public sealed class PullSubscription : SubscriptionBase
     /// <returns>Returns a collection of events that occurred since the last watermark.</returns>
     public async Task<GetEventsResults> GetEvents(CancellationToken token = default)
     {
-        var results = await Service.GetEvents(Id, Watermark, token);
+        var results = await Service.GetEvents(Id, Watermark, token).ConfigureAwait(false);
 
         Watermark = results.NewWatermark;
         MoreEventsAvailable = results.MoreEventsAvailable;

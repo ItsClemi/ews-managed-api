@@ -159,15 +159,7 @@ public class Item : ServiceObject
         ThrowIfThisIsNew();
         ThrowIfThisIsAttachment();
 
-        return Service.InternalLoadPropertiesForItems(
-            new[]
-            {
-                this,
-            },
-            propertySet,
-            ServiceErrorHandling.ThrowOnError,
-            token
-        );
+        return Service.InternalLoadPropertiesForItems([this,], propertySet, ServiceErrorHandling.ThrowOnError, token);
     }
 
     /// <summary>
@@ -248,14 +240,15 @@ public class Item : ServiceObject
         if (IsNew || IsDirty)
         {
             await Service.CreateItem(
-                this,
-                parentFolderId,
-                messageDisposition,
-                sendInvitationsMode ?? DefaultSendInvitationsMode,
-                token
-            );
+                    this,
+                    parentFolderId,
+                    messageDisposition,
+                    sendInvitationsMode ?? DefaultSendInvitationsMode,
+                    token
+                )
+                .ConfigureAwait(false);
 
-            await Attachments.Save(token);
+            await Attachments.Save(token).ConfigureAwait(false);
         }
     }
 
@@ -281,7 +274,7 @@ public class Item : ServiceObject
             conflictResolutionMode,
             messageDisposition,
             sendInvitationsOrCancellationsMode,
-            false,
+            suppressReadReceipts: false,
             token
         );
     }
@@ -313,14 +306,15 @@ public class Item : ServiceObject
         if (IsDirty && PropertyBag.GetIsUpdateCallNecessary())
         {
             returnedItem = await Service.UpdateItem(
-                this,
-                parentFolderId,
-                conflictResolutionMode,
-                messageDisposition,
-                sendInvitationsOrCancellationsMode ?? DefaultSendInvitationsOrCancellationsMode,
-                suppressReadReceipts,
-                token
-            );
+                    this,
+                    parentFolderId,
+                    conflictResolutionMode,
+                    messageDisposition,
+                    sendInvitationsOrCancellationsMode ?? DefaultSendInvitationsOrCancellationsMode,
+                    suppressReadReceipts,
+                    token
+                )
+                .ConfigureAwait(false);
         }
 
         // Regardless of whether item is dirty or not, if it has unprocessed
@@ -328,7 +322,7 @@ public class Item : ServiceObject
         if (HasUnprocessedAttachmentChanges())
         {
             Attachments.Validate();
-            await Attachments.Save(token);
+            await Attachments.Save(token).ConfigureAwait(false);
         }
 
         return returnedItem;
@@ -614,14 +608,14 @@ public class Item : ServiceObject
     /// <summary>
     ///     Gets the Id of this item.
     /// </summary>
-    public ItemId Id => (ItemId)PropertyBag[GetIdPropertyDefinition()];
+    public ItemId Id => (ItemId)PropertyBag[GetIdPropertyDefinition()]!;
 
     /// <summary>
     ///     Get or sets the MIME content of this item.
     /// </summary>
     public MimeContent MimeContent
     {
-        get => (MimeContent)PropertyBag[ItemSchema.MimeContent];
+        get => (MimeContent)PropertyBag[ItemSchema.MimeContent]!;
         set => PropertyBag[ItemSchema.MimeContent] = value;
     }
 
@@ -630,45 +624,45 @@ public class Item : ServiceObject
     /// </summary>
     public MimeContentUTF8 MimeContentUTF8
     {
-        get => (MimeContentUTF8)PropertyBag[ItemSchema.MimeContentUTF8];
+        get => (MimeContentUTF8)PropertyBag[ItemSchema.MimeContentUTF8]!;
         set => PropertyBag[ItemSchema.MimeContentUTF8] = value;
     }
 
     /// <summary>
     ///     Gets the Id of the parent folder of this item.
     /// </summary>
-    public FolderId ParentFolderId => (FolderId)PropertyBag[ItemSchema.ParentFolderId];
+    public FolderId ParentFolderId => (FolderId)PropertyBag[ItemSchema.ParentFolderId]!;
 
     /// <summary>
     ///     Gets or sets the sensitivity of this item.
     /// </summary>
     public Sensitivity Sensitivity
     {
-        get => (Sensitivity)PropertyBag[ItemSchema.Sensitivity];
+        get => (Sensitivity)PropertyBag[ItemSchema.Sensitivity]!;
         set => PropertyBag[ItemSchema.Sensitivity] = value;
     }
 
     /// <summary>
     ///     Gets a list of the attachments to this item.
     /// </summary>
-    public AttachmentCollection Attachments => (AttachmentCollection)PropertyBag[ItemSchema.Attachments];
+    public AttachmentCollection Attachments => (AttachmentCollection)PropertyBag[ItemSchema.Attachments]!;
 
     /// <summary>
     ///     Gets the time when this item was received.
     /// </summary>
-    public DateTime DateTimeReceived => (DateTime)PropertyBag[ItemSchema.DateTimeReceived];
+    public DateTime DateTimeReceived => (DateTime)PropertyBag[ItemSchema.DateTimeReceived]!;
 
     /// <summary>
     ///     Gets the size of this item.
     /// </summary>
-    public int Size => (int)PropertyBag[ItemSchema.Size];
+    public int Size => (int)PropertyBag[ItemSchema.Size]!;
 
     /// <summary>
     ///     Gets or sets the list of categories associated with this item.
     /// </summary>
     public StringList Categories
     {
-        get => (StringList)PropertyBag[ItemSchema.Categories];
+        get => (StringList)PropertyBag[ItemSchema.Categories]!;
         set => PropertyBag[ItemSchema.Categories] = value;
     }
 
@@ -677,7 +671,7 @@ public class Item : ServiceObject
     /// </summary>
     public string Culture
     {
-        get => (string)PropertyBag[ItemSchema.Culture];
+        get => (string)PropertyBag[ItemSchema.Culture]!;
         set => PropertyBag[ItemSchema.Culture] = value;
     }
 
@@ -686,7 +680,7 @@ public class Item : ServiceObject
     /// </summary>
     public Importance Importance
     {
-        get => (Importance)PropertyBag[ItemSchema.Importance];
+        get => (Importance)PropertyBag[ItemSchema.Importance]!;
         set => PropertyBag[ItemSchema.Importance] = value;
     }
 
@@ -695,68 +689,68 @@ public class Item : ServiceObject
     /// </summary>
     public string InReplyTo
     {
-        get => (string)PropertyBag[ItemSchema.InReplyTo];
+        get => (string)PropertyBag[ItemSchema.InReplyTo]!;
         set => PropertyBag[ItemSchema.InReplyTo] = value;
     }
 
     /// <summary>
     ///     Gets a value indicating whether the message has been submitted to be sent.
     /// </summary>
-    public bool IsSubmitted => (bool)PropertyBag[ItemSchema.IsSubmitted];
+    public bool IsSubmitted => (bool)PropertyBag[ItemSchema.IsSubmitted]!;
 
     /// <summary>
     ///     Gets a value indicating whether this is an associated item.
     /// </summary>
-    public bool IsAssociated => (bool)PropertyBag[ItemSchema.IsAssociated];
+    public bool IsAssociated => (bool)PropertyBag[ItemSchema.IsAssociated]!;
 
     /// <summary>
     ///     Gets a value indicating whether the item is is a draft. An item is a draft when it has not yet been sent.
     /// </summary>
-    public bool IsDraft => (bool)PropertyBag[ItemSchema.IsDraft];
+    public bool IsDraft => (bool)PropertyBag[ItemSchema.IsDraft]!;
 
     /// <summary>
     ///     Gets a value indicating whether the item has been sent by the current authenticated user.
     /// </summary>
-    public bool IsFromMe => (bool)PropertyBag[ItemSchema.IsFromMe];
+    public bool IsFromMe => (bool)PropertyBag[ItemSchema.IsFromMe]!;
 
     /// <summary>
     ///     Gets a value indicating whether the item is a resend of another item.
     /// </summary>
-    public bool IsResend => (bool)PropertyBag[ItemSchema.IsResend];
+    public bool IsResend => (bool)PropertyBag[ItemSchema.IsResend]!;
 
     /// <summary>
     ///     Gets a value indicating whether the item has been modified since it was created.
     /// </summary>
-    public bool IsUnmodified => (bool)PropertyBag[ItemSchema.IsUnmodified];
+    public bool IsUnmodified => (bool)PropertyBag[ItemSchema.IsUnmodified]!;
 
     /// <summary>
     ///     Gets a list of Internet headers for this item.
     /// </summary>
     public InternetMessageHeaderCollection InternetMessageHeaders =>
-        (InternetMessageHeaderCollection)PropertyBag[ItemSchema.InternetMessageHeaders];
+        (InternetMessageHeaderCollection)PropertyBag[ItemSchema.InternetMessageHeaders]!;
 
     /// <summary>
     ///     Gets the date and time this item was sent.
     /// </summary>
-    public DateTime DateTimeSent => (DateTime)PropertyBag[ItemSchema.DateTimeSent];
+    public DateTime DateTimeSent => (DateTime)PropertyBag[ItemSchema.DateTimeSent]!;
 
     /// <summary>
     ///     Gets the date and time this item was created.
     /// </summary>
-    public DateTime DateTimeCreated => (DateTime)PropertyBag[ItemSchema.DateTimeCreated];
+    public DateTime DateTimeCreated => (DateTime)PropertyBag[ItemSchema.DateTimeCreated]!;
 
     /// <summary>
     ///     Gets a value indicating which response actions are allowed on this item. Examples of response actions are Reply and
     ///     Forward.
     /// </summary>
-    public ResponseActions AllowedResponseActions => (ResponseActions)PropertyBag[ItemSchema.AllowedResponseActions];
+    public ResponseActions AllowedResponseActions => (ResponseActions)PropertyBag[ItemSchema.AllowedResponseActions]!;
 
     /// <summary>
     ///     Gets or sets the date and time when the reminder is due for this item.
     /// </summary>
     public DateTime ReminderDueBy
     {
-        get => (DateTime)PropertyBag[ItemSchema.ReminderDueBy];
+        get => (DateTime)PropertyBag[ItemSchema.ReminderDueBy]!;
         set => PropertyBag[ItemSchema.ReminderDueBy] = value;
     }
 
@@ -765,7 +759,7 @@ public class Item : ServiceObject
     /// </summary>
     public bool IsReminderSet
     {
-        get => (bool)PropertyBag[ItemSchema.IsReminderSet];
+        get => (bool)PropertyBag[ItemSchema.IsReminderSet]!;
         set => PropertyBag[ItemSchema.IsReminderSet] = value;
     }
 
@@ -774,31 +768,31 @@ public class Item : ServiceObject
     /// </summary>
     public int ReminderMinutesBeforeStart
     {
-        get => (int)PropertyBag[ItemSchema.ReminderMinutesBeforeStart];
+        get => (int)PropertyBag[ItemSchema.ReminderMinutesBeforeStart]!;
         set => PropertyBag[ItemSchema.ReminderMinutesBeforeStart] = value;
     }
 
     /// <summary>
     ///     Gets a text summarizing the Cc recipients of this item.
     /// </summary>
-    public string DisplayCc => (string)PropertyBag[ItemSchema.DisplayCc];
+    public string DisplayCc => (string)PropertyBag[ItemSchema.DisplayCc]!;
 
     /// <summary>
     ///     Gets a text summarizing the To recipients of this item.
     /// </summary>
-    public string DisplayTo => (string)PropertyBag[ItemSchema.DisplayTo];
+    public string DisplayTo => (string)PropertyBag[ItemSchema.DisplayTo]!;
 
     /// <summary>
     ///     Gets a value indicating whether the item has attachments.
     /// </summary>
-    public bool HasAttachments => (bool)PropertyBag[ItemSchema.HasAttachments];
+    public bool HasAttachments => (bool)PropertyBag[ItemSchema.HasAttachments]!;
 
     /// <summary>
     ///     Gets or sets the body of this item.
     /// </summary>
     public MessageBody Body
     {
-        get => (MessageBody)PropertyBag[ItemSchema.Body];
+        get => (MessageBody)PropertyBag[ItemSchema.Body]!;
         set => PropertyBag[ItemSchema.Body] = value;
     }
 
@@ -807,7 +801,7 @@ public class Item : ServiceObject
     /// </summary>
     public string ItemClass
     {
-        get => (string)PropertyBag[ItemSchema.ItemClass];
+        get => (string)PropertyBag[ItemSchema.ItemClass]!;
         set => PropertyBag[ItemSchema.ItemClass] = value;
     }
 
@@ -816,7 +810,7 @@ public class Item : ServiceObject
     /// </summary>
     public string Subject
     {
-        get => (string)PropertyBag[ItemSchema.Subject];
+        get => (string)PropertyBag[ItemSchema.Subject]!;
         set => SetSubject(value);
     }
 
@@ -824,81 +818,81 @@ public class Item : ServiceObject
     ///     Gets the query string that should be appended to the Exchange Web client URL to open this item using the
     ///     appropriate read form in a web browser.
     /// </summary>
-    public string WebClientReadFormQueryString => (string)PropertyBag[ItemSchema.WebClientReadFormQueryString];
+    public string WebClientReadFormQueryString => (string)PropertyBag[ItemSchema.WebClientReadFormQueryString]!;
 
     /// <summary>
     ///     Gets the query string that should be appended to the Exchange Web client URL to open this item using the
     ///     appropriate edit form in a web browser.
     /// </summary>
-    public string WebClientEditFormQueryString => (string)PropertyBag[ItemSchema.WebClientEditFormQueryString];
+    public string WebClientEditFormQueryString => (string)PropertyBag[ItemSchema.WebClientEditFormQueryString]!;
 
     /// <summary>
     ///     Gets a list of extended properties defined on this item.
     /// </summary>
     public ExtendedPropertyCollection ExtendedProperties =>
-        (ExtendedPropertyCollection)PropertyBag[ServiceObjectSchema.ExtendedProperties];
+        (ExtendedPropertyCollection)PropertyBag[ServiceObjectSchema.ExtendedProperties]!;
 
     /// <summary>
     ///     Gets a value indicating the effective rights the current authenticated user has on this item.
     /// </summary>
-    public EffectiveRights EffectiveRights => (EffectiveRights)PropertyBag[ItemSchema.EffectiveRights];
+    public EffectiveRights EffectiveRights => (EffectiveRights)PropertyBag[ItemSchema.EffectiveRights]!;
 
     /// <summary>
     ///     Gets the name of the user who last modified this item.
     /// </summary>
-    public string LastModifiedName => (string)PropertyBag[ItemSchema.LastModifiedName];
+    public string LastModifiedName => (string)PropertyBag[ItemSchema.LastModifiedName]!;
 
     /// <summary>
     ///     Gets the date and time this item was last modified.
     /// </summary>
-    public DateTime LastModifiedTime => (DateTime)PropertyBag[ItemSchema.LastModifiedTime];
+    public DateTime LastModifiedTime => (DateTime)PropertyBag[ItemSchema.LastModifiedTime]!;
 
     /// <summary>
     ///     Gets the Id of the conversation this item is part of.
     /// </summary>
-    public ConversationId ConversationId => (ConversationId)PropertyBag[ItemSchema.ConversationId];
+    public ConversationId ConversationId => (ConversationId)PropertyBag[ItemSchema.ConversationId]!;
 
     /// <summary>
     ///     Gets the body part that is unique to the conversation this item is part of.
     /// </summary>
-    public UniqueBody UniqueBody => (UniqueBody)PropertyBag[ItemSchema.UniqueBody];
+    public UniqueBody UniqueBody => (UniqueBody)PropertyBag[ItemSchema.UniqueBody]!;
 
     /// <summary>
     ///     Gets the store entry id.
     /// </summary>
-    public byte[] StoreEntryId => (byte[])PropertyBag[ItemSchema.StoreEntryId];
+    public byte[] StoreEntryId => (byte[])PropertyBag[ItemSchema.StoreEntryId]!;
 
     /// <summary>
     ///     Gets the item instance key.
     /// </summary>
-    public byte[] InstanceKey => (byte[])PropertyBag[ItemSchema.InstanceKey];
+    public byte[] InstanceKey => (byte[])PropertyBag[ItemSchema.InstanceKey]!;
 
     /// <summary>
     ///     Get or set the Flag value for this item.
     /// </summary>
     public Flag Flag
     {
-        get => (Flag)PropertyBag[ItemSchema.Flag];
+        get => (Flag)PropertyBag[ItemSchema.Flag]!;
         set => PropertyBag[ItemSchema.Flag] = value;
     }
 
     /// <summary>
     ///     Gets the normalized body of the item.
     /// </summary>
-    public NormalizedBody NormalizedBody => (NormalizedBody)PropertyBag[ItemSchema.NormalizedBody];
+    public NormalizedBody NormalizedBody => (NormalizedBody)PropertyBag[ItemSchema.NormalizedBody]!;
 
     /// <summary>
     ///     Gets the EntityExtractionResult of the item.
     /// </summary>
     public EntityExtractionResult EntityExtractionResult =>
-        (EntityExtractionResult)PropertyBag[ItemSchema.EntityExtractionResult];
+        (EntityExtractionResult)PropertyBag[ItemSchema.EntityExtractionResult]!;
 
     /// <summary>
     ///     Gets or sets the policy tag.
     /// </summary>
     public PolicyTag PolicyTag
     {
-        get => (PolicyTag)PropertyBag[ItemSchema.PolicyTag];
+        get => (PolicyTag)PropertyBag[ItemSchema.PolicyTag]!;
         set => PropertyBag[ItemSchema.PolicyTag] = value;
     }
 
@@ -907,36 +901,36 @@ public class Item : ServiceObject
     /// </summary>
     public ArchiveTag ArchiveTag
     {
-        get => (ArchiveTag)PropertyBag[ItemSchema.ArchiveTag];
+        get => (ArchiveTag)PropertyBag[ItemSchema.ArchiveTag]!;
         set => PropertyBag[ItemSchema.ArchiveTag] = value;
     }
 
     /// <summary>
     ///     Gets the retention date.
     /// </summary>
-    public DateTime RetentionDate => (DateTime)PropertyBag[ItemSchema.RetentionDate];
+    public DateTime RetentionDate => (DateTime)PropertyBag[ItemSchema.RetentionDate]!;
 
     /// <summary>
     ///     Gets the item Preview.
     /// </summary>
-    public string Preview => (string)PropertyBag[ItemSchema.Preview];
+    public string Preview => (string)PropertyBag[ItemSchema.Preview]!;
 
     /// <summary>
     ///     Gets the text body of the item.
     /// </summary>
-    public TextBody TextBody => (TextBody)PropertyBag[ItemSchema.TextBody];
+    public TextBody TextBody => (TextBody)PropertyBag[ItemSchema.TextBody]!;
 
     /// <summary>
     ///     Gets the icon index.
     /// </summary>
-    public IconIndex IconIndex => (IconIndex)PropertyBag[ItemSchema.IconIndex];
+    public IconIndex IconIndex => (IconIndex)PropertyBag[ItemSchema.IconIndex]!;
 
     /// <summary>
     ///     Gets or sets the list of hashtags associated with this item.
     /// </summary>
     public StringList Hashtags
     {
-        get => (StringList)PropertyBag[ItemSchema.Hashtags];
+        get => (StringList)PropertyBag[ItemSchema.Hashtags]!;
         set => PropertyBag[ItemSchema.Hashtags] = value;
     }
 
@@ -945,14 +939,14 @@ public class Item : ServiceObject
     /// </summary>
     public EmailAddressCollection Mentions
     {
-        get => (EmailAddressCollection)PropertyBag[ItemSchema.Mentions];
+        get => (EmailAddressCollection)PropertyBag[ItemSchema.Mentions]!;
         set => PropertyBag[ItemSchema.Mentions] = value;
     }
 
     /// <summary>
     ///     Gets a value indicating whether the item mentions me.
     /// </summary>
-    public bool MentionedMe => (bool)PropertyBag[ItemSchema.MentionedMe];
+    public bool MentionedMe => (bool)PropertyBag[ItemSchema.MentionedMe]!;
 
     /// <summary>
     ///     Gets the default setting for how to treat affected task occurrences on Delete.

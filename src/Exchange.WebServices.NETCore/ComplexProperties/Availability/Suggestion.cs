@@ -49,7 +49,7 @@ public sealed class Suggestion : ComplexProperty
     /// <summary>
     ///     Gets a collection of suggested times within the suggested day.
     /// </summary>
-    public Collection<TimeSuggestion> TimeSuggestions { get; } = new Collection<TimeSuggestion>();
+    public Collection<TimeSuggestion> TimeSuggestions { get; } = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Suggestion" /> class.

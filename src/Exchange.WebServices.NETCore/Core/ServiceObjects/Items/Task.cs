@@ -143,15 +143,19 @@ public class Task : Item
     ///     a Task object representing the current occurrence if the task is recurring and the uypdate changed its recurrence
     ///     pattern; or null in every other case.
     /// </returns>
-    public new async Task<Task> Update(ConflictResolutionMode conflictResolutionMode, CancellationToken token = default)
+    public new async Task<Task?> Update(
+        ConflictResolutionMode conflictResolutionMode,
+        CancellationToken token = default
+    )
     {
-        return (Task)await InternalUpdate(
-            null /* parentFolder */,
-            conflictResolutionMode,
-            MessageDisposition.SaveOnly,
-            null,
-            token
-        );
+        return (Task?)await InternalUpdate(
+                null /* parentFolder */,
+                conflictResolutionMode,
+                MessageDisposition.SaveOnly,
+                null,
+                token
+            )
+            .ConfigureAwait(false);
     }
 
 

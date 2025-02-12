@@ -77,14 +77,14 @@ public abstract partial class SearchFilter
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="RelationalFilter" /> class.
+        ///     Initializes a new instance of the <see cref="SearchFilter.RelationalFilter" /> class.
         /// </summary>
         internal RelationalFilter()
         {
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="RelationalFilter" /> class.
+        ///     Initializes a new instance of the <see cref="SearchFilter.RelationalFilter" /> class.
         /// </summary>
         /// <param name="propertyDefinition">
         ///     The definition of the property that is being compared. Property definitions are
@@ -105,7 +105,7 @@ public abstract partial class SearchFilter
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="RelationalFilter" /> class.
+        ///     Initializes a new instance of the <see cref="SearchFilter.RelationalFilter" /> class.
         /// </summary>
         /// <param name="propertyDefinition">
         ///     The definition of the property that is being compared. Property definitions are

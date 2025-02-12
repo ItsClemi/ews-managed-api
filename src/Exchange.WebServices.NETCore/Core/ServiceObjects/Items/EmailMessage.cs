@@ -121,19 +121,20 @@ public class EmailMessage : Item
         {
             if (Attachments.Count == 0 || messageDisposition == MessageDisposition.SaveOnly)
             {
-                await InternalCreate(parentFolderId, messageDisposition, null, token);
+                await InternalCreate(parentFolderId, messageDisposition, null, token).ConfigureAwait(false);
             }
             else
             {
                 // If the message has attachments, save as a draft (and add attachments) before sending.
                 await InternalCreate(
-                    null, // null means use the Drafts folder in the mailbox of the authenticated user.
-                    MessageDisposition.SaveOnly,
-                    null,
-                    token
-                );
+                        null, // null means use the Drafts folder in the mailbox of the authenticated user.
+                        MessageDisposition.SaveOnly,
+                        null,
+                        token
+                    )
+                    .ConfigureAwait(false);
 
-                await Service.SendItem(this, parentFolderId, token);
+                await Service.SendItem(this, parentFolderId, token).ConfigureAwait(false);
             }
         }
         else
@@ -145,22 +146,23 @@ public class EmailMessage : Item
             if (HasUnprocessedAttachmentChanges())
             {
                 Attachments.Validate();
-                await Attachments.Save(token);
+                await Attachments.Save(token).ConfigureAwait(false);
             }
 
             if (PropertyBag.GetIsUpdateCallNecessary())
             {
                 await InternalUpdate(
-                    parentFolderId,
-                    ConflictResolutionMode.AutoResolve,
-                    messageDisposition,
-                    null,
-                    token
-                );
+                        parentFolderId,
+                        ConflictResolutionMode.AutoResolve,
+                        messageDisposition,
+                        null,
+                        token
+                    )
+                    .ConfigureAwait(false);
             }
             else
             {
-                await Service.SendItem(this, parentFolderId, token);
+                await Service.SendItem(this, parentFolderId, token).ConfigureAwait(false);
             }
         }
     }

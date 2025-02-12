@@ -53,7 +53,7 @@ public sealed class TimeSuggestion : ComplexProperty
     /// <summary>
     ///     Gets a collection of conflicts at the suggested time.
     /// </summary>
-    public Collection<Conflict> Conflicts { get; } = new Collection<Conflict>();
+    public Collection<Conflict> Conflicts { get; } = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TimeSuggestion" /> class.

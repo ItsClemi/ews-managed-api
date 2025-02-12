@@ -260,7 +260,7 @@ public sealed class FileAttachment : Attachment
 
         try
         {
-            await Load();
+            await Load().ConfigureAwait(false);
         }
         finally
         {
@@ -281,11 +281,11 @@ public sealed class FileAttachment : Attachment
 
         try
         {
-            await Load();
+            await Load().ConfigureAwait(false);
         }
         finally
         {
-            await _loadToStream.DisposeAsync();
+            await _loadToStream.DisposeAsync().ConfigureAwait(false);
             _loadToStream = null;
         }
 

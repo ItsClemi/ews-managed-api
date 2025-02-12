@@ -256,7 +256,7 @@ public sealed class AttachmentCollection : ComplexPropertyCollection<Attachment>
     /// <summary>
     ///     Saves this collection by creating new attachment and deleting removed ones.
     /// </summary>
-    internal async System.Threading.Tasks.Task Save(CancellationToken token = default)
+    internal async System.Threading.Tasks.Task Save(CancellationToken cancellationToken = default)
     {
         var attachments = new List<Attachment>();
 
@@ -272,7 +272,7 @@ public sealed class AttachmentCollection : ComplexPropertyCollection<Attachment>
         // If any, delete them by calling the DeleteAttachment web method.
         if (attachments.Count > 0)
         {
-            await InternalDeleteAttachments(attachments, token);
+            await InternalDeleteAttachments(attachments, cancellationToken).ConfigureAwait(false);
         }
 
         attachments.Clear();
@@ -291,11 +291,13 @@ public sealed class AttachmentCollection : ComplexPropertyCollection<Attachment>
         {
             if (_owner.IsAttachment)
             {
-                await InternalCreateAttachments(_owner.ParentAttachment.Id, attachments, token);
+                await InternalCreateAttachments(_owner.ParentAttachment.Id, attachments, cancellationToken)
+                    .ConfigureAwait(false);
             }
             else
             {
-                await InternalCreateAttachments(_owner.Id.UniqueId, attachments, token);
+                await InternalCreateAttachments(_owner.Id.UniqueId, attachments, cancellationToken)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -308,7 +310,7 @@ public sealed class AttachmentCollection : ComplexPropertyCollection<Attachment>
                 if (itemAttachment.Item != null)
                 {
                     // Create/delete any sub-attachments
-                    await itemAttachment.Item.Attachments.Save(token);
+                    await itemAttachment.Item.Attachments.Save(cancellationToken).ConfigureAwait(false);
 
                     // Clear the item's change log
                     itemAttachment.Item.ClearChangeLog();
@@ -417,7 +419,7 @@ public sealed class AttachmentCollection : ComplexPropertyCollection<Attachment>
         CancellationToken token
     )
     {
-        var responses = await _owner.Service.DeleteAttachments(attachments, token);
+        var responses = await _owner.Service.DeleteAttachments(attachments, token).ConfigureAwait(false);
 
         foreach (var response in responses)
         {
@@ -448,7 +450,7 @@ public sealed class AttachmentCollection : ComplexPropertyCollection<Attachment>
         CancellationToken token
     )
     {
-        var responses = await _owner.Service.CreateAttachments(parentItemId, attachments, token);
+        var responses = await _owner.Service.CreateAttachments(parentItemId, attachments, token).ConfigureAwait(false);
 
         foreach (var response in responses)
         {
