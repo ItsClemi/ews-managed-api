@@ -177,7 +177,8 @@ internal class HangingTraceStream : Stream
             linkedTokenSource.CancelAfter(TimeSpan.FromMilliseconds(ReadTimeout));
         }
 
-        var retVal = await _underlyingStream.ReadAsync(buffer, offset, count, linkedTokenSource.Token);
+        var retVal = await _underlyingStream.ReadAsync(buffer, offset, count, linkedTokenSource.Token)
+            .ConfigureAwait(false);
         return PostRead(buffer, offset, count, retVal);
     }
 

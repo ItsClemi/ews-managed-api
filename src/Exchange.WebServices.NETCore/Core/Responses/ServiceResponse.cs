@@ -36,7 +36,7 @@ namespace Microsoft.Exchange.WebServices.Data;
 [PublicAPI]
 public class ServiceResponse
 {
-    private readonly Dictionary<string, string> _errorDetails = new();
+    private readonly Dictionary<string, string> _errorDetails = [];
 
     /// <summary>
     ///     Gets a value indicating whether a batch request stopped processing before the end.

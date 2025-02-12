@@ -228,12 +228,13 @@ internal sealed class WindowsLiveCredentials : WSSecurityBasedCredentials
 
         // NOTE: We're not tracing the request to Windows Live here because it has the user name and
         // password in it.
-        await using (var requestStream = await webRequest.GetRequestStreamAsync())
+        var requestStream = await webRequest.GetRequestStreamAsync().ConfigureAwait(false);
+        await using (requestStream.ConfigureAwait(false))
         {
-            await requestStream.WriteAsync(requestBytes);
+            await requestStream.WriteAsync(requestBytes).ConfigureAwait(false);
         }
 
-        return (HttpWebResponse)await webRequest.GetResponseAsync();
+        return (HttpWebResponse)await webRequest.GetResponseAsync().ConfigureAwait(false);
     }
 
     /// <summary>
@@ -314,7 +315,7 @@ internal sealed class WindowsLiveCredentials : WSSecurityBasedCredentials
 
         try
         {
-            response = await EmitTokenRequest(uriForTokenEndpointReference);
+            response = await EmitTokenRequest(uriForTokenEndpointReference).ConfigureAwait(false);
         }
         catch (EwsHttpClientException e)
         {

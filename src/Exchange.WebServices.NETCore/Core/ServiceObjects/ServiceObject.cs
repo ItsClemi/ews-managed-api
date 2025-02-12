@@ -468,7 +468,7 @@ public abstract class ServiceObject
     ///     The property definition for the Id of this object.
     /// </summary>
     /// <returns>A PropertyDefinition instance.</returns>
-    internal virtual PropertyDefinition GetIdPropertyDefinition()
+    internal virtual PropertyDefinition? GetIdPropertyDefinition()
     {
         return null;
     }

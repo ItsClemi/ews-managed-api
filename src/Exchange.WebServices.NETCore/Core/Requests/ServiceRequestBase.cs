@@ -796,7 +796,8 @@ internal abstract class ServiceRequestBase
             if (Service.IsTraceEnabledFor(TraceFlags.EwsResponse))
             {
                 using var memoryStream = new MemoryStream();
-                await using (var serviceResponseStream = await GetResponseStream(httpWebResponse).ConfigureAwait(false))
+                var serviceResponseStream = await GetResponseStream(httpWebResponse).ConfigureAwait(false);
+                await using (serviceResponseStream.ConfigureAwait(false))
                 {
                     // Copy response to in-memory stream and reset position to start.
                     await serviceResponseStream.CopyToAsync(memoryStream).ConfigureAwait(false);
@@ -810,9 +811,12 @@ internal abstract class ServiceRequestBase
             }
             else
             {
-                await using var stream = await GetResponseStream(httpWebResponse).ConfigureAwait(false);
-                var reader = new EwsServiceXmlReader(stream, Service);
-                soapFaultDetails = ReadSoapFault(reader);
+                var stream = await GetResponseStream(httpWebResponse).ConfigureAwait(false);
+                await using (stream.ConfigureAwait(false))
+                {
+                    var reader = new EwsServiceXmlReader(stream, Service);
+                    soapFaultDetails = ReadSoapFault(reader);
+                }
             }
 
             if (soapFaultDetails != null)
