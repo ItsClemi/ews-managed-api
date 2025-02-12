@@ -604,22 +604,24 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// </summary>
     /// <param name="folderId">The folder id.</param>
     /// <param name="propertySet">The property set.</param>
-    /// <param name="token"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>Folder</returns>
-    internal async Task<Folder?> BindToFolder(FolderId folderId, PropertySet propertySet, CancellationToken token)
+    internal async Task<Folder?> BindToFolder(
+        FolderId folderId,
+        PropertySet propertySet,
+        CancellationToken cancellationToken
+    )
     {
         EwsUtilities.ValidateParam(folderId);
         EwsUtilities.ValidateParam(propertySet);
 
         var responses = await InternalBindToFolders(
-            new[]
-            {
-                folderId,
-            },
-            propertySet,
-            ServiceErrorHandling.ThrowOnError,
-            token
-        );
+                [folderId,],
+                propertySet,
+                ServiceErrorHandling.ThrowOnError,
+                cancellationToken
+            )
+            .ConfigureAwait(false);
 
         return responses[0].Folder;
     }
@@ -630,16 +632,16 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// <typeparam name="TFolder">The type of the folder.</typeparam>
     /// <param name="folderId">The folder id.</param>
     /// <param name="propertySet">The property set.</param>
-    /// <param name="token"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>Folder</returns>
     internal async Task<TFolder> BindToFolder<TFolder>(
         FolderId folderId,
         PropertySet propertySet,
-        CancellationToken token
+        CancellationToken cancellationToken
     )
         where TFolder : Folder
     {
-        var result = await BindToFolder(folderId, propertySet, token);
+        var result = await BindToFolder(folderId, propertySet, cancellationToken).ConfigureAwait(false);
 
         if (result is not TFolder folder)
         {
@@ -676,13 +678,13 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// <param name="folderIds">The Ids of the folders to bind to.</param>
     /// <param name="propertySet">The set of properties to load.</param>
     /// <param name="errorHandling">Type of error handling to perform.</param>
-    /// <param name="token"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A ServiceResponseCollection providing results for each of the specified folder Ids.</returns>
     private Task<ServiceResponseCollection<GetFolderResponse>> InternalBindToFolders(
         IEnumerable<FolderId> folderIds,
         PropertySet propertySet,
         ServiceErrorHandling errorHandling,
-        CancellationToken token
+        CancellationToken cancellationToken
     )
     {
         var request = new GetFolderRequest(this, errorHandling)
@@ -692,7 +694,7 @@ public sealed class ExchangeService : ExchangeServiceBase
 
         request.FolderIds.AddRange(folderIds);
 
-        return request.ExecuteAsync(token);
+        return request.ExecuteAsync(cancellationToken);
     }
 
     /// <summary>

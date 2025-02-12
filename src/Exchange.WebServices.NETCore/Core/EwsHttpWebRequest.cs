@@ -113,11 +113,11 @@ internal class EwsHttpWebRequest
     ///     Returns a response from an Internet resource.
     /// </summary>
     /// <param name="headersOnly">Enables header only fetching</param>
-    /// <param name="token"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>
     ///     A <see cref="T:System.Net.HttpWebResponse" /> that contains the response from the Internet resource.
     /// </returns>
-    public async Task<IEwsHttpWebResponse> GetResponse(bool headersOnly, CancellationToken token)
+    public async Task<IEwsHttpWebResponse> GetResponse(bool headersOnly, CancellationToken cancellationToken)
     {
         using var message = CreateRequestMessage();
 
@@ -128,7 +128,12 @@ internal class EwsHttpWebRequest
         HttpResponseMessage? response;
         try
         {
-            response = await _httpClient.SendAsync(message, completionOption, token);
+            response = await _httpClient.SendAsync(message, completionOption, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // Forward cancellation token
+            throw;
         }
         catch (Exception exception)
         {

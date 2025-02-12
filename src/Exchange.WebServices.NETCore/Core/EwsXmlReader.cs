@@ -177,7 +177,7 @@ internal class EwsXmlReader
     {
         if (xmlNamespace == XmlNamespace.NotSpecified)
         {
-            InternalReadElement(string.Empty, localName, nodeType);
+            await InternalReadElementAsync(string.Empty, localName, nodeType).ConfigureAwait(false);
         }
         else
         {
@@ -236,7 +236,7 @@ internal class EwsXmlReader
         XmlNodeType nodeType
     )
     {
-        await ReadAsync(nodeType);
+        await ReadAsync(nodeType).ConfigureAwait(false);
 
         if (LocalName != localName || NamespacePrefix != namespacePrefix)
         {

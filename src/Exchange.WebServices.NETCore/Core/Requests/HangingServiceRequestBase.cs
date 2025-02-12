@@ -144,7 +144,8 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
     {
         lock (_lockObject)
         {
-            var (request, response) = ValidateAndEmitRequest(true, _tokenSource.Token).GetAwaiter().GetResult();
+            var (request, response) =
+                ValidateAndEmitRequest(headersOnly: true, _tokenSource.Token).GetAwaiter().GetResult();
 
             _request = request;
             _response = response;
@@ -158,7 +159,7 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
 
                 // Run parser on separate task-thread
                 _readTask = System.Threading.Tasks.Task.Factory.StartNew(
-                        async () => await ParseResponses(_tokenSource.Token),
+                        async () => await ParseResponses(_tokenSource.Token).ConfigureAwait(false),
                         _tokenSource.Token,
                         TaskCreationOptions.LongRunning,
                         TaskScheduler.Default
@@ -182,48 +183,53 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
             {
                 var traceEwsResponse = Service.IsTraceEnabledFor(TraceFlags.EwsResponse);
 
-                await using var responseStream = await _response.GetResponseStream(cancellationToken);
-                var tracingStream = new HangingTraceStream(responseStream, Service)
+                var responseStream = await _response.GetResponseStream(cancellationToken).ConfigureAwait(false);
+                await using (responseStream.ConfigureAwait(false))
                 {
-                    ReadTimeout = 2 * _heartbeatFrequencyMilliseconds,
-                };
+                    var tracingStream = new HangingTraceStream(responseStream, Service)
+                    {
+                        ReadTimeout = 2 * _heartbeatFrequencyMilliseconds,
+                    };
 
-                // EwsServiceMultiResponseXmlReader.Create causes a read.
-                if (traceEwsResponse)
-                {
-                    responseCopy = new MemoryStream();
-                    tracingStream.SetResponseCopy(responseCopy);
-                }
-
-                var ewsXmlReader = EwsServiceMultiResponseXmlReader.Create(tracingStream, Service);
-
-                while (IsConnected)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    object? responseObject;
+                    // EwsServiceMultiResponseXmlReader.Create causes a read.
                     if (traceEwsResponse)
                     {
-                        try
-                        {
-                            responseObject = await ReadResponseAsync(ewsXmlReader, _response.Headers);
-                        }
-                        finally
-                        {
-                            Service.TraceXml(TraceFlags.EwsResponse, responseCopy);
-                        }
-
-                        // reset the stream collector.
-                        await responseCopy.DisposeAsync();
                         responseCopy = new MemoryStream();
                         tracingStream.SetResponseCopy(responseCopy);
                     }
-                    else
-                    {
-                        responseObject = await ReadResponseAsync(ewsXmlReader, _response.Headers);
-                    }
 
-                    _responseHandler(responseObject);
+                    var ewsXmlReader = EwsServiceMultiResponseXmlReader.Create(tracingStream, Service);
+
+                    while (IsConnected)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        object? responseObject;
+                        if (traceEwsResponse)
+                        {
+                            try
+                            {
+                                responseObject = await ReadResponseAsync(ewsXmlReader, _response.Headers)
+                                    .ConfigureAwait(false);
+                            }
+                            finally
+                            {
+                                Service.TraceXml(TraceFlags.EwsResponse, responseCopy);
+                            }
+
+                            // reset the stream collector.
+                            await responseCopy.DisposeAsync().ConfigureAwait(false);
+                            responseCopy = new MemoryStream();
+                            tracingStream.SetResponseCopy(responseCopy);
+                        }
+                        else
+                        {
+                            responseObject = await ReadResponseAsync(ewsXmlReader, _response.Headers)
+                                .ConfigureAwait(false);
+                        }
+
+                        _responseHandler(responseObject);
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -265,7 +271,7 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
             {
                 if (responseCopy != null)
                 {
-                    await responseCopy.DisposeAsync();
+                    await responseCopy.DisposeAsync().ConfigureAwait(false);
                 }
             }
         }
