@@ -301,13 +301,13 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
     /// </summary>
     /// <param name="reason">The reason.</param>
     /// <param name="exception">The exception.</param>
-    internal void Disconnect(HangingRequestDisconnectReason reason, Exception? exception)
+    internal async void Disconnect(HangingRequestDisconnectReason reason, Exception? exception)
     {
         if (IsConnected)
         {
             _tokenSource.Cancel();
             // We do not care about exceptions here, as the ParseResponse handler provides a catch-all handler
-            _readTask.GetAwaiter().GetResult();
+            await _readTask;
 
             _response.Close();
             InternalOnDisconnect(reason, exception);
