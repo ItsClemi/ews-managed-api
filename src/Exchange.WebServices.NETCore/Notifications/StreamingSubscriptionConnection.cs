@@ -188,12 +188,7 @@ public sealed class StreamingSubscriptionConnection : IDisposable
 
         lock (_lockObject)
         {
-            if (_subscriptions.ContainsKey(subscription.Id))
-            {
-                return;
-            }
-
-            _subscriptions.Add(subscription.Id, subscription);
+            _subscriptions.TryAdd(subscription.Id, subscription);
         }
     }
 
@@ -368,11 +363,8 @@ public sealed class StreamingSubscriptionConnection : IDisposable
                 // Client can do any good or bad things in the above event handler
                 lock (_lockObject)
                 {
-                    if (_subscriptions != null && _subscriptions.ContainsKey(id))
-                    {
-                        // We are no longer servicing the subscription.
-                        _subscriptions.Remove(id);
-                    }
+                    // We are no longer servicing the subscription.
+                    _subscriptions?.Remove(id);
                 }
             }
         }

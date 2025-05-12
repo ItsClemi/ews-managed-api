@@ -101,7 +101,7 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
 
     private readonly CancellationTokenSource _tokenSource = new();
 
-    private System.Threading.Tasks.Task _readTask;
+    private System.Threading.Tasks.Task? _readTask;
 
     /// <summary>
     ///     Request to the server.
@@ -205,7 +205,12 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
                         cancellationToken.ThrowIfCancellationRequested();
 
                         object? responseObject;
-                        if (traceEwsResponse)
+                        if (responseCopy == null)
+                        {
+                            responseObject = await ReadResponseAsync(ewsXmlReader, _response.Headers)
+                                .ConfigureAwait(false);
+                        }
+                        else
                         {
                             try
                             {
@@ -214,18 +219,13 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
                             }
                             finally
                             {
-                                Service.TraceXml(TraceFlags.EwsResponse, responseCopy);
+                                Service.TraceXml(TraceFlags.EwsResponse, responseCopy!);
                             }
 
                             // reset the stream collector.
                             await responseCopy.DisposeAsync().ConfigureAwait(false);
                             responseCopy = new MemoryStream();
                             tracingStream.SetResponseCopy(responseCopy);
-                        }
-                        else
-                        {
-                            responseObject = await ReadResponseAsync(ewsXmlReader, _response.Headers)
-                                .ConfigureAwait(false);
                         }
 
                         _responseHandler(responseObject);
@@ -292,6 +292,11 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
     {
         lock (_lockObject)
         {
+            // Only cancel and wait for completion when we're cancelled externally.
+            _tokenSource.Cancel();
+
+            _readTask?.GetAwaiter().GetResult();
+
             Disconnect(HangingRequestDisconnectReason.UserInitiated, null);
         }
     }
@@ -305,10 +310,6 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
     {
         if (IsConnected)
         {
-            _tokenSource.Cancel();
-            // We do not care about exceptions here, as the ParseResponse handler provides a catch-all handler
-            _readTask.GetAwaiter().GetResult();
-
             _response.Close();
             InternalOnDisconnect(reason, exception);
         }
@@ -326,7 +327,14 @@ internal abstract class HangingServiceRequestBase : ServiceRequestBase
         {
             IsConnected = false;
 
-            OnDisconnect(this, new HangingRequestDisconnectEventArgs(reason, exception));
+            try
+            {
+                OnDisconnect(this, new HangingRequestDisconnectEventArgs(reason, exception));
+            }
+            catch (Exception)
+            {
+                // Ignore, as we have no parent to bubble the exception to
+            }
         }
     }
 

@@ -41,7 +41,7 @@ internal sealed class GetStreamingEventsResponse : ServiceResponse
     ///     Gets the error subscription ids.
     /// </summary>
     /// <value>The error subscription ids.</value>
-    internal List<string>? ErrorSubscriptionIds { get; private set; }
+    internal List<string> ErrorSubscriptionIds { get; } = [];
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="GetStreamingEventsResponse" /> class.
@@ -49,7 +49,6 @@ internal sealed class GetStreamingEventsResponse : ServiceResponse
     /// <param name="request">Request to disconnect when we get a close message.</param>
     internal GetStreamingEventsResponse(HangingServiceRequestBase request)
     {
-        ErrorSubscriptionIds = new List<string>();
         _request = request;
     }
 
@@ -71,7 +70,7 @@ internal sealed class GetStreamingEventsResponse : ServiceResponse
         {
             var connectionStatus = reader.ReadElementValue(XmlNamespace.Messages, XmlElementNames.ConnectionStatus);
 
-            if (connectionStatus.Equals(ConnectionStatus.Closed.ToString()))
+            if (string.Equals(connectionStatus, nameof(ConnectionStatus.Closed)))
             {
                 _request.Disconnect(HangingRequestDisconnectReason.Clean, null);
             }
