@@ -24,6 +24,10 @@
 		<PackageLicenseFile>license.txt</PackageLicenseFile>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
+	<PropertyGroup>
+		<AssemblyOriginatorKeyFile>../../ews.snk</AssemblyOriginatorKeyFile>
+		<SignAssembly>true</SignAssembly>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<Compile Remove="Credentials\BasicAuthModuleForUTF8.cs" />
