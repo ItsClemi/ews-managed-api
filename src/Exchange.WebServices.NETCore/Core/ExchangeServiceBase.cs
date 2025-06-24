@@ -416,7 +416,7 @@ public abstract class ExchangeServiceBase : IDisposable
         : this(requestedServerVersion)
     {
         UseDefaultCredentials = service.UseDefaultCredentials;
-        Credentials = service.Credentials;
+        _credentials = service.Credentials;
         _traceEnabled = service._traceEnabled;
         _traceListener = service._traceListener;
         TraceFlags = service.TraceFlags;
