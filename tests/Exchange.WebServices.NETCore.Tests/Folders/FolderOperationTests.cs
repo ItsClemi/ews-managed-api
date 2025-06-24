@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using Microsoft.Exchange.WebServices.Data;
 
 using Task = System.Threading.Tasks.Task;
@@ -35,5 +37,21 @@ public class FolderOperationTests : IClassFixture<ExchangeProvider>
         var folder = await Folder.Bind(service, WellKnownFolderName.ArchiveRoot, PropertySet.FirstClassProperties);
 
         Assert.NotNull(folder);
+    }
+
+    [Fact]
+    public async Task SyncFolderTest()
+    {
+        var service = _provider.CreateTestService();
+
+        var calendarFolder = new FolderId(WellKnownFolderName.Calendar);
+        var icc = await service.SyncFolderItems(
+            calendarFolder,
+            PropertySet.FirstClassProperties,
+            null,
+            123,
+            SyncFolderItemsScope.NormalItems,
+            "aaa"
+        );
     }
 }

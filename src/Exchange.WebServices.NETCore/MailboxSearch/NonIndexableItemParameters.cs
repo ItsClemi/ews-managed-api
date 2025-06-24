@@ -66,7 +66,7 @@ public sealed class GetNonIndexableItemDetailsParameters : NonIndexableItemParam
     /// <summary>
     ///     Page item reference
     /// </summary>
-    public string PageItemReference { get; set; }
+    public string? PageItemReference { get; set; }
 
     /// <summary>
     ///     Search page direction

@@ -43,7 +43,7 @@ internal sealed class GetNonIndexableItemDetailsRequest : SimpleServiceRequestBa
     /// <summary>
     ///     Page item reference
     /// </summary>
-    public string PageItemReference { get; set; }
+    public string? PageItemReference { get; set; }
 
     /// <summary>
     ///     Page direction

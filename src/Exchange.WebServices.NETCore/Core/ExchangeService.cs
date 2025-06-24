@@ -555,14 +555,16 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     SearchFilter.SearchFilterCollection
     /// </param>
     /// <param name="view">The view controlling the number of folders returned.</param>
+    /// <param name="token"></param>
     /// <returns>An object representing the results of the search operation.</returns>
     public Task<FindFoldersResults> FindFolders(
         WellKnownFolderName parentFolderName,
         SearchFilter searchFilter,
-        FolderView view
+        FolderView view,
+        CancellationToken token = default
     )
     {
-        return FindFolders(new FolderId(parentFolderName), searchFilter, view);
+        return FindFolders(new FolderId(parentFolderName), searchFilter, view, token);
     }
 
     /// <summary>
@@ -570,10 +572,15 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// </summary>
     /// <param name="parentFolderName">The name of the folder in which to search for folders.</param>
     /// <param name="view">The view controlling the number of folders returned.</param>
+    /// <param name="token"></param>
     /// <returns>An object representing the results of the search operation.</returns>
-    public Task<FindFoldersResults> FindFolders(WellKnownFolderName parentFolderName, FolderView view)
+    public Task<FindFoldersResults> FindFolders(
+        WellKnownFolderName parentFolderName,
+        FolderView view,
+        CancellationToken token = default
+    )
     {
-        return FindFolders(new FolderId(parentFolderName), view);
+        return FindFolders(new FolderId(parentFolderName), view, token);
     }
 
     /// <summary>
@@ -973,13 +980,15 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     Indicates if and how invitations and/or cancellations should be sent
     ///     for items of type Appointment. Required if items contains at least one Appointment instance.
     /// </param>
+    /// <param name="token"></param>
     /// <returns>A ServiceResponseCollection providing update results for each of the specified items.</returns>
     public Task<ServiceResponseCollection<UpdateItemResponse>> UpdateItems(
         IEnumerable<Item> items,
         FolderId savedItemsDestinationFolderId,
         ConflictResolutionMode conflictResolution,
         MessageDisposition? messageDisposition,
-        SendInvitationsOrCancellationsMode? sendInvitationsOrCancellationsMode
+        SendInvitationsOrCancellationsMode? sendInvitationsOrCancellationsMode,
+        CancellationToken token = default
     )
     {
         return UpdateItems(
@@ -988,7 +997,8 @@ public sealed class ExchangeService : ExchangeServiceBase
             conflictResolution,
             messageDisposition,
             sendInvitationsOrCancellationsMode,
-            false
+            false,
+            token
         );
     }
 
@@ -1587,14 +1597,16 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// <param name="parentFolderName">The name of the folder in which to search for items.</param>
     /// <param name="queryString">query string to be used for indexed search</param>
     /// <param name="view">The view controlling the number of items returned.</param>
+    /// <param name="token"></param>
     /// <returns>An object representing the results of the search operation.</returns>
     public Task<FindItemsResults<Item>> FindItems(
         WellKnownFolderName parentFolderName,
         string queryString,
-        ViewBase view
+        ViewBase view,
+        CancellationToken token = default
     )
     {
-        return FindItems(new FolderId(parentFolderName), queryString, view);
+        return FindItems(new FolderId(parentFolderName), queryString, view, token);
     }
 
     /// <summary>
@@ -1608,14 +1620,16 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     SearchFilter.SearchFilterCollection
     /// </param>
     /// <param name="view">The view controlling the number of items returned.</param>
+    /// <param name="token"></param>
     /// <returns>An object representing the results of the search operation.</returns>
     public Task<FindItemsResults<Item>> FindItems(
         WellKnownFolderName parentFolderName,
         SearchFilter searchFilter,
-        ViewBase view
+        ViewBase view,
+        CancellationToken token = default
     )
     {
-        return FindItems(new FolderId(parentFolderName), searchFilter, view);
+        return FindItems(new FolderId(parentFolderName), searchFilter, view, token);
     }
 
     /// <summary>
@@ -2104,15 +2118,17 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     Indicates which instance of a recurring task should be deleted. Required if any
     ///     of the item Ids represents a Task.
     /// </param>
+    /// <param name="token"></param>
     /// <returns>A ServiceResponseCollection providing deletion results for each of the specified item Ids.</returns>
     public Task<ServiceResponseCollection<ServiceResponse>> DeleteItems(
         IEnumerable<ItemId> itemIds,
         DeleteMode deleteMode,
         SendCancellationsMode? sendCancellationsMode,
-        AffectedTaskOccurrence? affectedTaskOccurrences
+        AffectedTaskOccurrence? affectedTaskOccurrences,
+        CancellationToken token = default
     )
     {
-        return DeleteItems(itemIds, deleteMode, sendCancellationsMode, affectedTaskOccurrences, false);
+        return DeleteItems(itemIds, deleteMode, sendCancellationsMode, affectedTaskOccurrences, false, token);
     }
 
     /// <summary>
@@ -2304,15 +2320,17 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// </param>
     /// <param name="view">The view which defines the number of persona being returned</param>
     /// <param name="queryString">The query string for which the search is being performed</param>
+    /// <param name="token"></param>
     /// <returns>A collection of personas matching the search conditions</returns>
     public Task<ICollection<Persona>> FindPeople(
         WellKnownFolderName folderName,
         SearchFilter searchFilter,
         ViewBase view,
-        string queryString
+        string queryString,
+        CancellationToken token = default
     )
     {
-        return FindPeople(new FolderId(folderName), searchFilter, view, queryString);
+        return FindPeople(new FolderId(folderName), searchFilter, view, queryString, token);
     }
 
     /// <summary>
@@ -2334,7 +2352,7 @@ public sealed class ExchangeService : ExchangeServiceBase
         EwsUtilities.ValidateParamAllowNull(folderId);
         EwsUtilities.ValidateParamAllowNull(searchFilter);
         EwsUtilities.ValidateParamAllowNull(view);
-        EwsUtilities.ValidateMethodVersion(this, ExchangeVersion.Exchange2013_SP1, "FindPeople");
+        EwsUtilities.ValidateMethodVersion(this, ExchangeVersion.Exchange2013_SP1, nameof(FindPeople));
 
         var request = new FindPeopleRequest(this)
         {
@@ -2354,20 +2372,27 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// <param name="folderName">Name of the folder being browsed</param>
     /// <param name="searchFilter">Search filter</param>
     /// <param name="view">The view which defines paging and the number of personas being returned</param>
+    /// <param name="token"></param>
     /// <returns>A result object containing resultset for browsing</returns>
-    public Task<FindPeopleResults> FindPeople(WellKnownFolderName folderName, SearchFilter searchFilter, ViewBase view)
+    public Task<FindPeopleResults> FindPeople(
+        WellKnownFolderName folderName,
+        SearchFilter searchFilter,
+        ViewBase view,
+        CancellationToken token = default
+    )
     {
-        return FindPeople(new FolderId(folderName), searchFilter, view);
+        return FindPeople(new FolderId(folderName), searchFilter, view, token);
     }
 
     /// <summary>
     ///     Retrieves all people who are relevant to the user
     /// </summary>
     /// <param name="view">The view which defines the number of personas being returned</param>
+    /// <param name="token"></param>
     /// <returns>A collection of personas matching the query string</returns>
-    public Task<IPeopleQueryResults> BrowsePeople(ViewBase view)
+    public Task<IPeopleQueryResults> BrowsePeople(ViewBase view, CancellationToken token = default)
     {
-        return BrowsePeople(view, null);
+        return BrowsePeople(view, null, token);
     }
 
     /// <summary>
@@ -2392,10 +2417,11 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// </summary>
     /// <param name="view">The view which defines the number of personas being returned</param>
     /// <param name="queryString">The query string for which the search is being performed</param>
+    /// <param name="token"></param>
     /// <returns>A collection of personas matching the query string</returns>
-    public Task<IPeopleQueryResults> SearchPeople(ViewBase view, string queryString)
+    public Task<IPeopleQueryResults> SearchPeople(ViewBase view, string queryString, CancellationToken token = default)
     {
-        return SearchPeople(view, queryString, null, null);
+        return SearchPeople(view, queryString, null, null, token);
     }
 
     /// <summary>
@@ -2668,10 +2694,11 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     that match the one passed as a parameter. Calling this method results in a call to EWS.
     /// </summary>
     /// <param name="nameToResolve">The name to resolve.</param>
+    /// <param name="token"></param>
     /// <returns>A collection of name resolutions whose names match the one passed as a parameter.</returns>
-    public Task<NameResolutionCollection> ResolveName(string nameToResolve)
+    public Task<NameResolutionCollection> ResolveName(string nameToResolve, CancellationToken token = default)
     {
-        return ResolveName(nameToResolve, ResolveNameSearchLocation.ContactsThenDirectory, false);
+        return ResolveName(nameToResolve, ResolveNameSearchLocation.ContactsThenDirectory, false, token);
     }
 
     /// <summary>
@@ -2685,15 +2712,17 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     Indicates whether full contact information should be returned for each of the found
     ///     contacts.
     /// </param>
+    /// <param name="token"></param>
     /// <returns>A collection of name resolutions whose names match the one passed as a parameter.</returns>
     public Task<NameResolutionCollection> ResolveName(
         string nameToResolve,
         IEnumerable<FolderId>? parentFolderIds,
         ResolveNameSearchLocation searchScope,
-        bool returnContactDetails
+        bool returnContactDetails,
+        CancellationToken token = default
     )
     {
-        return ResolveName(nameToResolve, parentFolderIds, searchScope, returnContactDetails, null);
+        return ResolveName(nameToResolve, parentFolderIds, searchScope, returnContactDetails, null, token);
     }
 
     /// <summary>
@@ -2721,7 +2750,7 @@ public sealed class ExchangeService : ExchangeServiceBase
     {
         if (contactDataPropertySet != null)
         {
-            EwsUtilities.ValidateMethodVersion(this, ExchangeVersion.Exchange2010_SP1, "ResolveName");
+            EwsUtilities.ValidateMethodVersion(this, ExchangeVersion.Exchange2010_SP1, nameof(ResolveName));
         }
 
         EwsUtilities.ValidateParam(nameToResolve);
@@ -2755,15 +2784,17 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     contacts.
     /// </param>
     /// <param name="contactDataPropertySet">Property set for contact details</param>
+    /// <param name="token"></param>
     /// <returns>A collection of name resolutions whose names match the one passed as a parameter.</returns>
     public Task<NameResolutionCollection> ResolveName(
         string nameToResolve,
         ResolveNameSearchLocation searchScope,
         bool returnContactDetails,
-        PropertySet contactDataPropertySet
+        PropertySet contactDataPropertySet,
+        CancellationToken token = default
     )
     {
-        return ResolveName(nameToResolve, null, searchScope, returnContactDetails, contactDataPropertySet);
+        return ResolveName(nameToResolve, null, searchScope, returnContactDetails, contactDataPropertySet, token);
     }
 
     /// <summary>
@@ -2776,14 +2807,16 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     Indicates whether full contact information should be returned for each of the found
     ///     contacts.
     /// </param>
+    /// <param name="token"></param>
     /// <returns>A collection of name resolutions whose names match the one passed as a parameter.</returns>
     public Task<NameResolutionCollection> ResolveName(
         string nameToResolve,
         ResolveNameSearchLocation searchScope,
-        bool returnContactDetails
+        bool returnContactDetails,
+        CancellationToken token = default
     )
     {
-        return ResolveName(nameToResolve, null, searchScope, returnContactDetails);
+        return ResolveName(nameToResolve, null, searchScope, returnContactDetails, token);
     }
 
     /// <summary>
@@ -2809,8 +2842,9 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     Expands a group by retrieving a list of its members. Calling this method results in a call to EWS.
     /// </summary>
     /// <param name="groupId">The Id of the group to expand.</param>
+    /// <param name="token"></param>
     /// <returns>An ExpandGroupResults containing the members of the group.</returns>
-    public Task<ExpandGroupResults> ExpandGroup(ItemId groupId)
+    public Task<ExpandGroupResults> ExpandGroup(ItemId groupId, CancellationToken token = default)
     {
         EwsUtilities.ValidateParam(groupId);
 
@@ -2819,19 +2853,20 @@ public sealed class ExchangeService : ExchangeServiceBase
             Id = groupId,
         };
 
-        return ExpandGroup(emailAddress);
+        return ExpandGroup(emailAddress, token);
     }
 
     /// <summary>
     ///     Expands a group by retrieving a list of its members. Calling this method results in a call to EWS.
     /// </summary>
     /// <param name="smtpAddress">The SMTP address of the group to expand.</param>
+    /// <param name="token"></param>
     /// <returns>An ExpandGroupResults containing the members of the group.</returns>
-    public Task<ExpandGroupResults> ExpandGroup(string smtpAddress)
+    public Task<ExpandGroupResults> ExpandGroup(string smtpAddress, CancellationToken token = default)
     {
         EwsUtilities.ValidateParam(smtpAddress);
 
-        return ExpandGroup(new EmailAddress(smtpAddress));
+        return ExpandGroup(new EmailAddress(smtpAddress), token);
     }
 
     /// <summary>
@@ -2839,8 +2874,9 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// </summary>
     /// <param name="address">The SMTP address of the group to expand.</param>
     /// <param name="routingType">The routing type of the address of the group to expand.</param>
+    /// <param name="token"></param>
     /// <returns>An ExpandGroupResults containing the members of the group.</returns>
-    public Task<ExpandGroupResults> ExpandGroup(string address, string routingType)
+    public Task<ExpandGroupResults> ExpandGroup(string address, string routingType, CancellationToken token = default)
     {
         EwsUtilities.ValidateParam(address);
         EwsUtilities.ValidateParam(routingType);
@@ -2850,7 +2886,7 @@ public sealed class ExchangeService : ExchangeServiceBase
             RoutingType = routingType,
         };
 
-        return ExpandGroup(emailAddress);
+        return ExpandGroup(emailAddress, token);
     }
 
     /// <summary>
@@ -2926,7 +2962,7 @@ public sealed class ExchangeService : ExchangeServiceBase
         EwsUtilities.ValidateMethodVersion(
             this,
             ExchangeVersion.Exchange2010,
-            "SubscribeToPullNotificationsOnAllFolders"
+            nameof(SubscribeToPullNotificationsOnAllFolders)
         );
 
         var responses = await BuildSubscribeToPullNotificationsRequest(null, timeout, watermark, eventTypes)
@@ -3437,6 +3473,7 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// <param name="maxChangesReturned">The maximum number of changes that should be returned.</param>
     /// <param name="syncScope">The sync scope identifying items to include in the ChangeCollection.</param>
     /// <param name="syncState">The optional sync state representing the point in time when to start the synchronization.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns>A ChangeCollection containing a list of changes that occurred in the specified folder.</returns>
     public Task<ChangeCollection<ItemChange>> SyncFolderItems(
         FolderId syncFolderId,
@@ -3444,10 +3481,20 @@ public sealed class ExchangeService : ExchangeServiceBase
         IEnumerable<ItemId> ignoredItemIds,
         int maxChangesReturned,
         SyncFolderItemsScope syncScope,
-        string syncState
+        string syncState,
+        CancellationToken cancellationToken = default
     )
     {
-        return SyncFolderItems(syncFolderId, propertySet, ignoredItemIds, maxChangesReturned, 0, syncScope, syncState);
+        return SyncFolderItems(
+            syncFolderId,
+            propertySet,
+            ignoredItemIds,
+            maxChangesReturned,
+            0,
+            syncScope,
+            syncState,
+            cancellationToken
+        );
     }
 
     /// <summary>
@@ -3561,10 +3608,15 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// </summary>
     /// <param name="propertySet">The set of properties to retrieve for synchronized items.</param>
     /// <param name="syncState">The optional sync state representing the point in time when to start the synchronization.</param>
+    /// <param name="token"></param>
     /// <returns>A ChangeCollection containing a list of changes that occurred in the specified folder.</returns>
-    public Task<ChangeCollection<FolderChange>> SyncFolderHierarchy(PropertySet propertySet, string syncState)
+    public Task<ChangeCollection<FolderChange>> SyncFolderHierarchy(
+        PropertySet propertySet,
+        string syncState,
+        CancellationToken token = default
+    )
     {
-        return SyncFolderHierarchy(null, propertySet, syncState);
+        return SyncFolderHierarchy(null, propertySet, syncState, token);
     }
 
     /// <summary>
@@ -3687,6 +3739,7 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// <param name="attendees">The attendees for which to retrieve availability information.</param>
     /// <param name="timeWindow">The time window in which to retrieve user availability information.</param>
     /// <param name="requestedData">The requested data (free/busy and/or suggestions).</param>
+    /// <param name="token"></param>
     /// <returns>
     ///     The availability information for each user appears in a unique FreeBusyResponse object. The order of users
     ///     in the request determines the order of availability data for each user in the response.
@@ -3694,10 +3747,11 @@ public sealed class ExchangeService : ExchangeServiceBase
     public Task<GetUserAvailabilityResults> GetUserAvailability(
         IEnumerable<AttendeeInfo> attendees,
         TimeWindow timeWindow,
-        AvailabilityData requestedData
+        AvailabilityData requestedData,
+        CancellationToken token = default
     )
     {
-        return GetUserAvailability(attendees, timeWindow, requestedData, new AvailabilityOptions());
+        return GetUserAvailability(attendees, timeWindow, requestedData, new AvailabilityOptions(), token);
     }
 
     /// <summary>
@@ -5334,15 +5388,17 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// <param name="actionType">Action type</param>
     /// <param name="query">Query string</param>
     /// <param name="inPlaceHoldIdentity">in-place hold identity</param>
+    /// <param name="token"></param>
     /// <returns>Service response object</returns>
     public Task<SetHoldOnMailboxesResponse> SetHoldOnMailboxes(
         string holdId,
         HoldAction actionType,
         string query,
-        string inPlaceHoldIdentity
+        string inPlaceHoldIdentity,
+        CancellationToken token = default
     )
     {
-        return SetHoldOnMailboxes(holdId, actionType, query, inPlaceHoldIdentity, null);
+        return SetHoldOnMailboxes(holdId, actionType, query, inPlaceHoldIdentity, null, token);
     }
 
     /// <summary>
@@ -5423,10 +5479,20 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     Get non indexable item details
     /// </summary>
     /// <param name="mailboxes">Array of mailbox legacy DN</param>
+    /// <param name="token"></param>
     /// <returns>Service response object</returns>
-    public Task<GetNonIndexableItemDetailsResponse> GetNonIndexableItemDetails(string[] mailboxes)
+    public Task<GetNonIndexableItemDetailsResponse> GetNonIndexableItemDetails(
+        string[] mailboxes,
+        CancellationToken token = default
+    )
     {
-        return GetNonIndexableItemDetails(mailboxes, pageSize: null, pageItemReference: null, pageDirection: null);
+        return GetNonIndexableItemDetails(
+            mailboxes,
+            pageSize: null,
+            pageItemReference: null,
+            pageDirection: null,
+            token
+        );
     }
 
     /// <summary>
@@ -5436,12 +5502,14 @@ public sealed class ExchangeService : ExchangeServiceBase
     /// <param name="pageSize">The page size</param>
     /// <param name="pageItemReference">Page item reference</param>
     /// <param name="pageDirection">Page direction</param>
+    /// <param name="token"></param>
     /// <returns>Service response object</returns>
     public Task<GetNonIndexableItemDetailsResponse> GetNonIndexableItemDetails(
         string[] mailboxes,
         int? pageSize,
         string? pageItemReference,
-        SearchPageDirection? pageDirection
+        SearchPageDirection? pageDirection,
+        CancellationToken token = default
     )
     {
         var parameters = new GetNonIndexableItemDetailsParameters
@@ -5453,7 +5521,7 @@ public sealed class ExchangeService : ExchangeServiceBase
             SearchArchiveOnly = false,
         };
 
-        return GetNonIndexableItemDetails(parameters);
+        return GetNonIndexableItemDetails(parameters, token);
     }
 
     /// <summary>
@@ -5476,8 +5544,12 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     Get non indexable item statistics
     /// </summary>
     /// <param name="mailboxes">Array of mailbox legacy DN</param>
+    /// <param name="token"></param>
     /// <returns>Service response object</returns>
-    public Task<GetNonIndexableItemStatisticsResponse> GetNonIndexableItemStatistics(string[] mailboxes)
+    public Task<GetNonIndexableItemStatisticsResponse> GetNonIndexableItemStatistics(
+        string[] mailboxes,
+        CancellationToken token = default
+    )
     {
         var parameters = new GetNonIndexableItemStatisticsParameters
         {
@@ -5485,7 +5557,7 @@ public sealed class ExchangeService : ExchangeServiceBase
             SearchArchiveOnly = false,
         };
 
-        return GetNonIndexableItemStatistics(parameters);
+        return GetNonIndexableItemStatistics(parameters, token);
     }
 
     /// <summary>
@@ -5582,9 +5654,11 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     GetClientAccessToken
     /// </summary>
     /// <param name="idAndTypes">Id and Types</param>
+    /// <param name="token"></param>
     /// <returns>A ServiceResponseCollection providing token results for each of the specified id and types.</returns>
     public Task<ServiceResponseCollection<GetClientAccessTokenResponse>> GetClientAccessToken(
-        IEnumerable<KeyValuePair<string, ClientAccessTokenType>> idAndTypes
+        IEnumerable<KeyValuePair<string, ClientAccessTokenType>> idAndTypes,
+        CancellationToken token = default
     )
     {
         // TODO: check this mutation
@@ -5597,7 +5671,7 @@ public sealed class ExchangeService : ExchangeServiceBase
             requestList.Add(clientAccessTokenRequest);
         }
 
-        return GetClientAccessToken(requestList.ToArray());
+        return GetClientAccessToken(requestList.ToArray(), token);
     }
 
     /// <summary>
@@ -5778,9 +5852,9 @@ public sealed class ExchangeService : ExchangeServiceBase
     ///     Get App Marketplace Url.
     /// </summary>
     /// <remarks>Exception will be thrown for errors. </remarks>
-    public Task<string> GetAppMarketplaceUrl()
+    public Task<string> GetAppMarketplaceUrl(CancellationToken token = default)
     {
-        return GetAppMarketplaceUrl(null, null);
+        return GetAppMarketplaceUrl(null, null, token);
     }
 
     /// <summary>
