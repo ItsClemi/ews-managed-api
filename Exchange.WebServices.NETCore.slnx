@@ -15,6 +15,7 @@
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />
     <Project Path="tests/Exchange.WebServices.NETCore.Autodiscover.Tests/Exchange.WebServices.NETCore.Autodiscover.Tests.csproj" />
+    <Project Path="tests/Exchange.WebServices.NETCore.NativeAot/Exchange.WebServices.NETCore.NativeAot.csproj" />
     <Project Path="tests/Exchange.WebServices.NETCore.Tests/Exchange.WebServices.NETCore.Tests.csproj" />
   </Folder>
 </Solution>

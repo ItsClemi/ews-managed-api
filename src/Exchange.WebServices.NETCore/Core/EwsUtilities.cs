@@ -1253,16 +1253,19 @@ internal static partial class EwsUtilities
     /// <param name="enumType">Type of the enum.</param>
     /// <param name="enumName">The enum name.</param>
     /// <returns>Exchange version in which the enum value was first defined.</returns>
-    private static ExchangeVersion GetEnumVersion(Type enumType, string enumName)
+    private static ExchangeVersion GetEnumVersion(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType,
+        string enumName
+    )
     {
-        var memberInfo = enumType.GetMember(enumName);
+        var memberInfo = enumType.GetField(enumName);
         Assert(
-            memberInfo != null && memberInfo.Length > 0,
+            memberInfo != null,
             "EwsUtilities.GetEnumVersion",
             "Enum member " + enumName + " not found in " + enumType
         );
 
-        var attrs = memberInfo[0].GetCustomAttributes<RequiredServerVersionAttribute>(false).ToArray();
+        var attrs = memberInfo!.GetCustomAttributes<RequiredServerVersionAttribute>(false).ToArray();
         if (attrs != null && attrs.Length > 0)
         {
             return attrs[0].Version;
@@ -1276,7 +1279,9 @@ internal static partial class EwsUtilities
     /// </summary>
     /// <param name="enumType">Type of the enum.</param>
     /// <returns>Dictionary of enum values to versions.</returns>
-    private static Dictionary<Enum, ExchangeVersion> BuildEnumDict(Type enumType)
+    private static Dictionary<Enum, ExchangeVersion> BuildEnumDict(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType
+    )
     {
         var dict = new Dictionary<Enum, ExchangeVersion>();
 
@@ -1297,16 +1302,19 @@ internal static partial class EwsUtilities
     /// <param name="enumType">Type of the enum.</param>
     /// <param name="enumName">The enum name.</param>
     /// <returns>The name for the enum used in the protocol, or null if it is the same as the enum's ToString().</returns>
-    private static string? GetEnumSchemaName(Type enumType, string enumName)
+    private static string? GetEnumSchemaName(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType,
+        string enumName
+    )
     {
-        var memberInfo = enumType.GetMember(enumName);
+        var memberInfo = enumType.GetField(enumName);
         Assert(
-            memberInfo != null && memberInfo.Length > 0,
+            memberInfo != null,
             "EwsUtilities.GetEnumSchemaName",
             "Enum member " + enumName + " not found in " + enumType
         );
 
-        var attrs = memberInfo[0].GetCustomAttributes<EwsEnumAttribute>(false).ToArray();
+        var attrs = memberInfo!.GetCustomAttributes<EwsEnumAttribute>(false).ToArray();
         if (attrs != null && attrs.Length > 0)
         {
             return attrs[0].SchemaName;
@@ -1320,7 +1328,9 @@ internal static partial class EwsUtilities
     /// </summary>
     /// <param name="enumType">Type of the enum.</param>
     /// <returns>The mapping from enum to schema name</returns>
-    private static Dictionary<string, Enum> BuildSchemaToEnumDict(Type enumType)
+    private static Dictionary<string, Enum> BuildSchemaToEnumDict(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType
+    )
     {
         var dict = new Dictionary<string, Enum>();
         var names = Enum.GetNames(enumType);
@@ -1344,7 +1354,9 @@ internal static partial class EwsUtilities
     /// </summary>
     /// <param name="enumType">Type of the enum.</param>
     /// <returns>The mapping from enum to schema name</returns>
-    private static Dictionary<Enum, string> BuildEnumToSchemaDict(Type enumType)
+    private static Dictionary<Enum, string> BuildEnumToSchemaDict(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType
+    )
     {
         var dict = new Dictionary<Enum, string>();
         var names = Enum.GetNames(enumType);
