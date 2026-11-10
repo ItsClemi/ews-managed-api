@@ -47,10 +47,10 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
     ///     If you add a new ServiceObject subclass that has an associated schema, add the schema type
     ///     to the list below.
     /// </remarks>
-    private static readonly Lazy<List<Type>> AllSchemaTypes = new(
+    private static readonly Lazy<List<SchemaType>> AllSchemaTypes = new(
         () =>
         {
-            var typeList = new List<Type>
+            var typeList = new List<SchemaType>
             {
                 typeof(AppointmentSchema),
                 typeof(CalendarResponseObjectSchema),
@@ -78,7 +78,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
 #if DEBUG
             // Verify that all Schema types in the Managed API assembly have been included.
             var missingTypes = from type in typeof(ServiceObjectSchema).GetTypeInfo().Assembly.ExportedTypes
-                where type.GetTypeInfo().IsSubclassOf(typeof(ServiceObjectSchema)) && !typeList.Contains(type)
+                where type.GetTypeInfo().IsSubclassOf(typeof(ServiceObjectSchema)) && !typeList.Any(schema => schema.Type == type)
                 select type;
 
             if (missingTypes.Any())
@@ -91,6 +91,26 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
         }
     );
 
+    // A plain List<Type> cannot carry the field-preservation requirement through enumeration.
+    private readonly struct SchemaType
+    {
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
+        public Type Type { get; }
+
+        private SchemaType(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
+            Type type
+        )
+        {
+            Type = type;
+        }
+
+        public static implicit operator SchemaType(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
+            Type type
+        ) => new(type);
+    }
+
     /// <summary>
     ///     Dictionary of all property definitions.
     /// </summary>
@@ -101,7 +121,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
 
             foreach (var type in AllSchemaTypes.Value)
             {
-                AddSchemaPropertiesToDictionary(type, propDefDictionary);
+                AddSchemaPropertiesToDictionary(type.Type, propDefDictionary);
             }
 
             return propDefDictionary;
@@ -120,7 +140,11 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
     /// </summary>
     /// <param name="type">The type.</param>
     /// <param name="propFieldDelegate">The property field delegate.</param>
-    internal static void ForeachPublicStaticPropertyFieldInType(Type type, PropertyFieldInfoDelegate propFieldDelegate)
+    internal static void ForeachPublicStaticPropertyFieldInType(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
+        Type type,
+        PropertyFieldInfoDelegate propFieldDelegate
+    )
     {
         var fieldInfos = type.GetRuntimeFields().ToArray();
 
@@ -141,6 +165,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
     /// <param name="type">Schema type.</param>
     /// <param name="propDefDictionary">The property definition dictionary.</param>
     internal static void AddSchemaPropertiesToDictionary(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
         Type type,
         Dictionary<string, PropertyDefinitionBase> propDefDictionary
     )
@@ -186,6 +211,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
     /// <param name="type">The type.</param>
     /// <param name="propertyNameDictionary">The property name dictionary.</param>
     private static void AddSchemaPropertyNamesToDictionary(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
         Type type,
         Dictionary<PropertyDefinition, string> propertyNameDictionary
     )
@@ -224,7 +250,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
             foreach (var type in AllSchemaTypes.Value)
             {
                 ForeachPublicStaticPropertyFieldInType(
-                    type,
+                    type.Type,
                     (propDef, fieldInfo) => { propDef.Name = fieldInfo.Name; }
                 );
             }
