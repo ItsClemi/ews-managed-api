@@ -155,6 +155,7 @@ internal static partial class EwsUtilities
     /// <param name="condition">Assertion.</param>
     /// <param name="caller">The caller.</param>
     /// <param name="message">The message to use if assertion fails.</param>
+    [Conditional("DEBUG")]
     internal static void Assert([DoesNotReturnIf(false)] bool condition, string caller, string message)
     {
         Debug.Assert(condition, $"[{caller}] {message}");
@@ -1258,14 +1259,14 @@ internal static partial class EwsUtilities
         string enumName
     )
     {
-        var memberInfo = enumType.GetField(enumName);
+        var fieldInfo = enumType.GetField(enumName);
         Assert(
-            memberInfo != null,
+            fieldInfo != null,
             "EwsUtilities.GetEnumVersion",
             "Enum member " + enumName + " not found in " + enumType
         );
 
-        var attrs = memberInfo!.GetCustomAttributes<RequiredServerVersionAttribute>(false).ToArray();
+        var attrs = fieldInfo.GetCustomAttributes<RequiredServerVersionAttribute>(false).ToArray();
         if (attrs != null && attrs.Length > 0)
         {
             return attrs[0].Version;
@@ -1307,14 +1308,14 @@ internal static partial class EwsUtilities
         string enumName
     )
     {
-        var memberInfo = enumType.GetField(enumName);
+        var fieldInfo = enumType.GetField(enumName);
         Assert(
-            memberInfo != null,
+            fieldInfo != null,
             "EwsUtilities.GetEnumSchemaName",
             "Enum member " + enumName + " not found in " + enumType
         );
 
-        var attrs = memberInfo!.GetCustomAttributes<EwsEnumAttribute>(false).ToArray();
+        var attrs = fieldInfo.GetCustomAttributes<EwsEnumAttribute>(false).ToArray();
         if (attrs != null && attrs.Length > 0)
         {
             return attrs[0].SchemaName;

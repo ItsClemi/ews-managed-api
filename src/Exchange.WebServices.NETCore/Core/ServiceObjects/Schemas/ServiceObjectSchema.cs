@@ -38,6 +38,26 @@ namespace Microsoft.Exchange.WebServices.Data;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
 {
+    private const DynamicallyAccessedMemberTypes MemberFlags = DynamicallyAccessedMemberTypes.PublicFields |
+                                                               DynamicallyAccessedMemberTypes.NonPublicFields;
+
+
+    private readonly struct SchemaType
+    {
+        [DynamicallyAccessedMembers(MemberFlags)]
+        public Type Type { get; }
+
+
+        private SchemaType([DynamicallyAccessedMembers(MemberFlags)] Type type)
+        {
+            Type = type;
+        }
+
+
+        public static implicit operator SchemaType([DynamicallyAccessedMembers(MemberFlags)] Type type) => new(type);
+    }
+
+
     private static readonly object LockObject = new();
 
     /// <summary>
@@ -47,8 +67,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
     ///     If you add a new ServiceObject subclass that has an associated schema, add the schema type
     ///     to the list below.
     /// </remarks>
-    private static readonly Lazy<List<SchemaType>> AllSchemaTypes = new(
-        () =>
+    private static readonly Lazy<List<SchemaType>> AllSchemaTypes = new(() =>
         {
             var typeList = new List<SchemaType>
             {
@@ -78,7 +97,8 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
 #if DEBUG
             // Verify that all Schema types in the Managed API assembly have been included.
             var missingTypes = from type in typeof(ServiceObjectSchema).GetTypeInfo().Assembly.ExportedTypes
-                where type.GetTypeInfo().IsSubclassOf(typeof(ServiceObjectSchema)) && !typeList.Any(schema => schema.Type == type)
+                where type.GetTypeInfo().IsSubclassOf(typeof(ServiceObjectSchema)) &&
+                      typeList.All(schema => schema.Type != type)
                 select type;
 
             if (missingTypes.Any())
@@ -91,31 +111,11 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
         }
     );
 
-    // A plain List<Type> cannot carry the field-preservation requirement through enumeration.
-    private readonly struct SchemaType
-    {
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
-        public Type Type { get; }
-
-        private SchemaType(
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
-            Type type
-        )
-        {
-            Type = type;
-        }
-
-        public static implicit operator SchemaType(
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
-            Type type
-        ) => new(type);
-    }
 
     /// <summary>
     ///     Dictionary of all property definitions.
     /// </summary>
-    private static readonly Lazy<Dictionary<string, PropertyDefinitionBase>> AllSchemaProperties = new(
-        () =>
+    private static readonly Lazy<Dictionary<string, PropertyDefinitionBase>> AllSchemaProperties = new(() =>
         {
             var propDefDictionary = new Dictionary<string, PropertyDefinitionBase>();
 
@@ -141,8 +141,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
     /// <param name="type">The type.</param>
     /// <param name="propFieldDelegate">The property field delegate.</param>
     internal static void ForeachPublicStaticPropertyFieldInType(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
-        Type type,
+        [DynamicallyAccessedMembers(MemberFlags)] Type type,
         PropertyFieldInfoDelegate propFieldDelegate
     )
     {
@@ -165,8 +164,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
     /// <param name="type">Schema type.</param>
     /// <param name="propDefDictionary">The property definition dictionary.</param>
     internal static void AddSchemaPropertiesToDictionary(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
-        Type type,
+        [DynamicallyAccessedMembers(MemberFlags)] Type type,
         Dictionary<string, PropertyDefinitionBase> propDefDictionary
     )
     {
@@ -211,8 +209,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
     /// <param name="type">The type.</param>
     /// <param name="propertyNameDictionary">The property name dictionary.</param>
     private static void AddSchemaPropertyNamesToDictionary(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields)]
-        Type type,
+        [DynamicallyAccessedMembers(MemberFlags)] Type type,
         Dictionary<PropertyDefinition, string> propertyNameDictionary
     )
     {
@@ -272,7 +269,7 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
         );
 
     private readonly Dictionary<string, PropertyDefinition> _properties = new();
-    private readonly List<PropertyDefinition> _visibleProperties = new();
+    private readonly List<PropertyDefinition> _visibleProperties = [];
 
     /// <summary>
     ///     Registers a schema property.
@@ -339,17 +336,17 @@ public abstract class ServiceObjectSchema : IEnumerable<PropertyDefinition>
     /// <summary>
     ///     Gets the list of first class properties for this service object type.
     /// </summary>
-    internal List<PropertyDefinition> FirstClassProperties { get; } = new();
+    internal List<PropertyDefinition> FirstClassProperties { get; } = [];
 
     /// <summary>
     ///     Gets the list of first class summary properties for this service object type.
     /// </summary>
-    internal List<PropertyDefinition> FirstClassSummaryProperties { get; } = new();
+    internal List<PropertyDefinition> FirstClassSummaryProperties { get; } = [];
 
     /// <summary>
     ///     Gets the list of indexed properties for this service object type.
     /// </summary>
-    internal List<IndexedPropertyDefinition> IndexedProperties { get; } = new();
+    internal List<IndexedPropertyDefinition> IndexedProperties { get; } = [];
 
     /// <summary>
     ///     Tries to get property definition.
