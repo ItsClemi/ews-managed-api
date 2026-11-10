@@ -5,36 +5,36 @@
 
     <ItemGroup>
         <PackageVersion Include="MinVer" Version="8.0.0" />
-		<PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
+		<PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.404" />
 		<PackageVersion Include="DotNet.ReproducibleBuilds" Version="2.0.5" />
         <PackageVersion Include="JetBrains.Annotations" Version="2026.2.0" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <PackageVersion Include="System.DirectoryServices" Version="10.0.12" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))" />
-        <PackageVersion Include="System.DirectoryServices" Version="9.0.18" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0')) AND !$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))" />
+        <PackageVersion Include="System.DirectoryServices" Version="10.0.15" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))" />
+        <PackageVersion Include="System.DirectoryServices" Version="9.0.23" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0')) AND !$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))" />
         <PackageVersion Include="System.DirectoryServices" Version="8.0.0" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))" />
 
-		<PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.12" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))" />
-		<PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.18" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0')) AND !$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))" />
-		<PackageVersion Include="System.Security.Cryptography.Xml" Version="8.0.4" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))" />
+		<PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.15" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))" />
+		<PackageVersion Include="System.Security.Cryptography.Xml" Version="9.0.23" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0')) AND !$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))" />
+		<PackageVersion Include="System.Security.Cryptography.Xml" Version="8.0.5" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))" />
 
 		<PackageVersion Include="DnsClient" Version="1.8.0" />
     </ItemGroup>
 
     <ItemGroup>
-	    <PackageVersion Include="TUnit" Version="1.69.0" />
+	    <PackageVersion Include="TUnit" Version="1.81.16" />
 
-		<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+		<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.15" />
 
-		<PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.12" />
-		<PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.12" />
+		<PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.15" />
+		<PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.15" />
 
-		<PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.12" />
-		<PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.12" />
+		<PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.15" />
+		<PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.15" />
 
-        <PackageVersion Include="Microsoft.Identity.Client" Version="4.90.0" />
-	    <PackageVersion Include="Microsoft.Identity.Web.TokenCache" Version="4.15.0"/>
+        <PackageVersion Include="Microsoft.Identity.Client" Version="4.92.0" />
+	    <PackageVersion Include="Microsoft.Identity.Web.TokenCache" Version="4.18.0"/>
     </ItemGroup>
 </Project>
